@@ -15,5 +15,9 @@ Um **digital garden** é uma forma de organizar e partilhar conhecimento pessoal
 - Servir como **repositório** de conhecimento, sempre em atualização
 - Incentivar a escrita e **reflexão contínua**, sem a pressão de perfeição.
 
-## Como sur
+## Como surgiram?
+O conceito não é novo: é uma evolução de várias ideias antigas.
+- Nos anos 90 e inicio dos anos 2000, alguns bloggers já mantinham páginas com hiperligações manuais entre temas.
+- Ganhou nova força com ferramentas que promovem **ligação entre notas** - como o Obsidian.
+- Popularizou-se em 2020 com um artigo de [Maggie Appleton](https://maggieappleton.com/garden-history), onde ela explicou a metáfora do jardim: um espaço vivo, cultivado ao longo do tempo, em contraste com os blogs tradicionais.
 
