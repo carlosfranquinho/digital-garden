@@ -43,6 +43,7 @@ custom_css = ["css/custom.css"]
 [markup.goldmark]
     [markup.goldmark.renderer]
       unsafe = true
+      hardWraps = true
     [markup.goldmark.parser]
       autoHeadingID = true
       [markup.goldmark.parser.attribute]
