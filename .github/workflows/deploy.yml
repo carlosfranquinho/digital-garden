@@ -1,25 +1,43 @@
-name: Deploy via FTP
+name: Deploy Digital Garden
 
 on:
   push:
     branches:
       - main
+  repository_dispatch:
+    types: [obsidian-update]
 
 jobs:
-  ftp-deploy:
-    name: 📤 Upload para servidor FTP
+  build-and-deploy:
+    name: 🌱 Build & Deploy Garden
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🔄 Clonar repositório
+      - name: 🔄 Clonar repositório Hugo (este)
         uses: actions/checkout@v3
 
-      - name: 🏗️ Instalar Hugo
+      - name: 🔄 Clonar notas do Obsidian
+        uses: actions/checkout@v3
+        with:
+          repository: carlosfranquinho/obsidian-vault
+          path: notas
+          token: ${{ secrets.GARDEN_TOKEN }}
+
+      - name: 🐍 Instalar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: 📦 Executar script de exportação das notas
+        run: |
+          python3 .github/scripts/exportar_obsidian.py
+
+      - name: 🛠️ Instalar Hugo
         uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: 'latest'
 
-      - name: 🛠️ Gerar site com Hugo
+      - name: 📦 Gerar site com Hugo
         run: hugo --minify
 
       - name: 📡 Fazer deploy via FTP
