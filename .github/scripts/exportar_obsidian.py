@@ -24,9 +24,19 @@ def slugify(value):
     return re.sub(r"[-\s]+", "-", value)
 
 # 1. Procurar notas com publish: true e copiar
+import yaml
+
 def deve_publicar(caminho_ficheiro):
     with open(caminho_ficheiro, 'r', encoding='utf-8') as f:
-        return 'publish: true' in f.read()
+        lines = f.read()
+        if lines.strip().startswith('---'):
+            try:
+                front = yaml.safe_load(lines.split('---')[1])
+                return str(front.get("publish", "false")).lower() == "true"
+            except Exception:
+                return False
+    return False
+
 
 def copiar_notas_e_imagens():
     imagens_map = {}  # nome_original -> nome_slug
