@@ -28,6 +28,9 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: 📦 Instalar dependências Python
+        run: pip install pyyaml
+
       - name: 📦 Executar script de exportação das notas
         run: |
           python3 .github/scripts/exportar_obsidian.py
