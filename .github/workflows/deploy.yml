@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: 🔄 Clonar repositório Hugo (este)
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GARDEN_TOKEN }}
 
       - name: 🔄 Clonar notas do Obsidian
         uses: actions/checkout@v3
@@ -28,9 +30,22 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: 📦 Instalar dependências Python
+        run: pip install pyyaml
+
       - name: 📦 Executar script de exportação das notas
         run: |
           python3 .github/scripts/exportar_obsidian.py
+
+      - name: 📦 Commit e Push de novas notas exportadas
+        env:
+          GH_PAT: ${{ secrets.GARDEN_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add content/post
+          git commit -m "✨ Exportar novas notas do Obsidian" || echo "Nada a commitar"
+          git push https://x-access-token:${GH_PAT}@github.com/carlosfranquinho/digital-garden.git main
 
       - name: 🛠️ Instalar Hugo
         uses: peaceiris/actions-hugo@v2

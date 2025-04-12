@@ -24,9 +24,19 @@ def slugify(value):
     return re.sub(r"[-\s]+", "-", value)
 
 # 1. Procurar notas com publish: true e copiar
+import yaml
+
 def deve_publicar(caminho_ficheiro):
     with open(caminho_ficheiro, 'r', encoding='utf-8') as f:
-        return 'publish: true' in f.read()
+        lines = f.read()
+        if lines.strip().startswith('---'):
+            try:
+                front = yaml.safe_load(lines.split('---')[1])
+                return str(front.get("publish", "false")).lower() == "true"
+            except Exception:
+                return False
+    return False
+
 
 def copiar_notas_e_imagens():
     imagens_map = {}  # nome_original -> nome_slug
@@ -35,18 +45,23 @@ def copiar_notas_e_imagens():
             if not file.endswith(".md"):
                 continue
             caminho_original = os.path.join(root, file)
+
+            print(f"🔍 Encontrado: {caminho_original}")
+
             if not deve_publicar(caminho_original):
+                print(f"⛔ Ignorado (sem publish): {caminho_original}")
                 continue
 
             rel_path = os.path.relpath(caminho_original, origem)
             destino_ficheiro = os.path.join(destino_md, rel_path)
             os.makedirs(os.path.dirname(destino_ficheiro), exist_ok=True)
             shutil.copy2(caminho_original, destino_ficheiro)
+            print(f"✅ Copiado: {rel_path}")
 
             with open(destino_ficheiro, 'r', encoding='utf-8') as f:
                 conteudo = f.read()
 
-            # encontrar imagens ![[...]] e ![](...)
+            # procurar imagens
             imagens = re.findall(r'!\[\[(.*?)\]\]', conteudo) + re.findall(r'!\[.*?\]\((.*?)\)', conteudo)
             for nome in imagens:
                 nome = nome.strip()
@@ -66,8 +81,8 @@ def copiar_notas_e_imagens():
                     print(f"✅ Copiada: {nome} → {slug}")
                 else:
                     print(f"⚠️ Não encontrada: {nome}")
-
     return imagens_map
+
 
 # 2. Corrigir links internos [[...]] → [...](...)
 def format_link(link_text):
