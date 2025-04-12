@@ -1,0 +1,20 @@
+# Pasta gerada com o site final
+/public/
+
+# Recursos gerados pelo Hugo
+/resources/_gen/
+/.hugo_build.lock
+
+# Ficheiros temporários e auxiliares
+estrutura.txt
+
+# MacOS
+.DS_Store
+
+# VSCode ou editores
+.vscode/
+*.code-workspace
+
+# Python __pycache__, se usares scripts
+__pycache__/
+*.pyc

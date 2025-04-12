@@ -1,0 +1,54 @@
+baseURL = "https://carlos.franquinho.info/"  # Altera para o teu domínio real
+languageCode = "pt-pt"
+title = "Digital Garden do Carlos"
+theme = "github-style"
+pygmentsCodeFences = true
+pygmentsUseClasses = true
+
+[params]
+author = "Carlos Franquinho"
+description = "Algumas notas em modo digital garden"
+github = "carlosfranquinho"
+facebook = "franquinho"
+instagram = "franqui"
+email = "carlosfranquinho@gmail.com"
+url = "https://carlos.franquinho.info"
+keywords = ["digital garden", "obsidian", "hugo", "conhecimento"]
+favicon = "images/favicon.ico"
+avatar = "/images/avatar.png"
+location = "Marinha Grande, Portugal"
+enableGitalk = false
+enableRSS = true
+enableGoogleAnalytics = false
+custom_css = ["css/custom.css"]
+
+[menu]
+  [[menu.main]]
+    name = "Início"
+    url = "/"
+    weight = 1
+  [[menu.main]]
+    name = "Sobre"
+    url = "/about/"
+    weight = 2
+  [[menu.main]]
+    name = "Arquivo"
+    url = "/post/"
+    weight = 3
+
+[markup]
+  [markup.highlight]
+    noClasses = false
+    
+[markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+    [markup.goldmark.parser]
+      autoHeadingID = true
+      [markup.goldmark.parser.attribute]
+        block = true
+        title = true
+      [markup.goldmark.parser.wikilinks]
+        enable = true
+        linkResolution = "page"
+        hrefStyle = "pretty"

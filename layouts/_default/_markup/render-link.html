@@ -1,0 +1,12 @@
+{{- $link := .Destination -}}
+{{- $text := .Text | safeHTML -}}
+
+{{- if (strings.HasPrefix $text "[[") -}}
+  {{- $clean := strings.TrimPrefix $text "[[" | strings.TrimSuffix "]]" -}}
+  {{- $parts := split $clean "|" -}}
+  {{- $target := index $parts 0 | urlize -}}
+  {{- $label := cond (gt (len $parts) 1) (index $parts 1) $target -}}
+  <a href="/post/{{ $target }}">{{ $label }}</a>
+{{- else -}}
+  <a href="{{ $link }}">{{ $text }}</a>
+{{- end -}}
