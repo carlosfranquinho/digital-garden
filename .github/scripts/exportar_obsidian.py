@@ -16,6 +16,12 @@ destino_md = "content/post"
 pasta_attachments = os.path.join(origem, "attachments")
 pasta_imagens_destino = "static/imagens"
 
+import glob
+
+# 0. Limpar notas anteriores
+for ficheiro in glob.glob(os.path.join(destino_md, "**/*.md"), recursive=True):
+    os.remove(ficheiro)
+    print(f"🗑️ Apagada nota antiga: {ficheiro}")
 
 # Ferramenta de slugificação
 def slugify(value):
