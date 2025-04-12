@@ -36,12 +36,14 @@ jobs:
           python3 .github/scripts/exportar_obsidian.py
 
       - name: 📦 Commit e Push de novas notas exportadas
+        env:
+          GH_PAT: ${{ secrets.GARDEN_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add content/post
           git commit -m "✨ Exportar novas notas do Obsidian" || echo "Nada a commitar"
-          git push origin main
+          git push https://x-access-token:${GH_PAT}@github.com/carlosfranquinho/digital-garden.git main
 
       - name: 🛠️ Instalar Hugo
         uses: peaceiris/actions-hugo@v2
