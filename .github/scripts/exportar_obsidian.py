@@ -110,8 +110,12 @@ if len(partes) >= 3:
 
     # Debug final para ver exatamente o que foi escrito
     print(f"Novo YAML para ({relpath}): {yaml_part}")
+    
+    # Gravar destino preservando subpastas
+    destino = DEST_DIR / Path(relpath)
+    destino.parent.mkdir(parents=True, exist_ok=True)
 
     with open(destino, 'w', encoding='utf-8') as f:
         f.write(conteudo)
 
-    print(f"Processado com sucesso: {relpath}")
+    print(f"✅ Nota exportada: {destino}")
