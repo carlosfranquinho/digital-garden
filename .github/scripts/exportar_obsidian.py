@@ -15,7 +15,7 @@ from urllib.parse import quote
 REPO_BASE = Path(__file__).resolve().parent.parent.parent
 NOTAS_DIR = REPO_BASE / "notas"
 DEST_DIR = REPO_BASE / "content" / "post"
-ATTACHMENTS_DIR = Path.home() / "cinquenta" / "attachments"
+ATTACHMENTS_DIR = NOTAS_DIR.parent / "attachments"
 STATIC_IMG_DIR = REPO_BASE / "static" / "imagens"
 
 parser = argparse.ArgumentParser()
