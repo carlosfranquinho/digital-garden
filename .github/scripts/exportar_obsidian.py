@@ -69,13 +69,15 @@ for relpath in paths:
     conteudo = corrigir_imagens(conteudo, slug_map, slug_map)
 
     # Corrigir data no front matter se necessário
-    partes = conteudo.split('---')
-    if len(partes) >= 3:
-        yaml_part = yaml.safe_load(partes[1])
-        if 'date' not in yaml_part:
-            yaml_part['date'] = fonte.stat().st_mtime  # pode formatar melhor se quiseres
-        novo_yaml = yaml.dump(yaml_part, allow_unicode=True)
-        conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
+partes = conteudo.split('---')
+if len(partes) >= 3:
+    yaml_part = yaml.safe_load(partes[1])
+    if 'date' not in yaml_part:
+        from datetime import datetime
+        mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
+        yaml_part['date'] = mtime.isoformat()
+    novo_yaml = yaml.dump(yaml_part, allow_unicode=True)
+    conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
 
     # Gravar destino preservando subpastas
     destino = DEST_DIR / Path(relpath)
