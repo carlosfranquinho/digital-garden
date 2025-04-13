@@ -1,5 +1,5 @@
 ---
-date: 11-04-2025 18:00
+date: '2025-04-11T18:00:00'
 publish: true
 tags:
 - genética
