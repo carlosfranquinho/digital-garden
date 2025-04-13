@@ -68,22 +68,40 @@ for relpath in paths:
     slug_map = copiar_e_slugificar_imagens(conteudo)
     conteudo = corrigir_imagens(conteudo, slug_map, slug_map)
 
-    # Corrigir data no front matter se necessário
-partes = conteudo.split('---')
-if len(partes) >= 3:
-    yaml_part = yaml.safe_load(partes[1])
-    if 'date' not in yaml_part:
+    # Corrigir data no front matter (corrigir ou gerar nova)
+    partes = conteudo.split('---')
+    if len(partes) >= 3:
+        yaml_part = yaml.safe_load(partes[1])
+
         from datetime import datetime
-        mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
-        yaml_part['date'] = mtime.isoformat()
-    novo_yaml = yaml.dump(yaml_part, allow_unicode=True)
-    conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
+        data_valida = None
 
-    # Gravar destino preservando subpastas
-    destino = DEST_DIR / Path(relpath)
-    destino.parent.mkdir(parents=True, exist_ok=True)
+        if 'date' in yaml_part:
+            try:
+                # Tentar converter do formato Obsidian: "13-04-2025 20:30"
+                data_valida = datetime.strptime(yaml_part['date'], "%d-%m-%Y %H:%M")
+            except Exception:
+                try:
+                    # Tentar converter como ISO (caso já esteja ok)
+                    data_valida = datetime.fromisoformat(yaml_part['date'])
+                except Exception as e:
+                    print(f"⚠️ Erro a interpretar data: {yaml_part['date']} → {e}")
+        
+        # Se não estava presente ou era inválida, gerar nova
+        if not data_valida:
+            data_valida = datetime.fromtimestamp(fonte.stat().st_mtime)
 
-    with open(destino, 'w', encoding='utf-8') as f:
-        f.write(conteudo)
+        yaml_part['date'] = data_valida.isoformat()
 
-    print(f"✅ Nota exportada: {destino}")
+        # Recriar o conteúdo com o front matter corrigido
+        novo_yaml = yaml.dump(yaml_part, allow_unicode=True)
+        conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
+
+        # Gravar destino preservando subpastas
+        destino = DEST_DIR / Path(relpath)
+        destino.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(destino, 'w', encoding='utf-8') as f:
+            f.write(conteudo)
+
+        print(f"✅ Nota exportada: {destino}")
