@@ -70,51 +70,32 @@ for relpath in paths:
     conteudo = corrigir_imagens(conteudo, slug_map, slug_map)
 
     # Processar front matter
+    # Corrigir data no front matter se necessário
     partes = conteudo.split('---')
     if len(partes) >= 3:
-        try:
-            yaml_part = yaml.safe_load(partes[1])
-            if yaml_part is None:
-                yaml_part = {}
-        except yaml.YAMLError as e:
-            print(f"⚠️ Erro no YAML: {e}")
-            yaml_part = {}
+        yaml_part = yaml.safe_load(partes[1])
+        from datetime import datetime
 
-        # Tratamento de data
-        data_valida = None
-        
-        # Tentar obter data do front matter existente
         if 'date' in yaml_part:
             try:
-                # Formato Obsidian: "13-04-2025 20:30"
-                if isinstance(yaml_part['date'], str) and ' ' in yaml_part['date']:
-                    data_valida = datetime.strptime(yaml_part['date'], "%d-%m-%Y %H:%M")
-                # Já está em formato ISO
-                elif isinstance(yaml_part['date'], str):
-                    data_valida = datetime.fromisoformat(yaml_part['date'])
+                # Converte a data no formato "13-04-2025 20:30" para ISO
+                data_original = yaml_part['date']
+                data_convertida = datetime.strptime(data_original, "%d-%m-%Y %H:%M")
+                yaml_part['date'] = data_convertida.isoformat()
             except Exception as e:
-                print(f"⚠️ Erro a interpretar data: {yaml_part['date']} → {e}")
+                print(f"⚠️ Data inválida em '{relpath}': {e}")
+                # Substitui por data de modificação do ficheiro
+                mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
+                yaml_part['date'] = mtime.isoformat()
+        else:
+            # Se não houver campo 'date', usa a data de modificação do ficheiro
+            mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
+            yaml_part['date'] = mtime.isoformat()
 
-        # Se não conseguiu obter data válida, usar data de modificação do arquivo
-        if not data_valida:
-            data_valida = datetime.fromtimestamp(fonte.stat().st_mtime)
+        novo_yaml = yaml.dump(yaml_part, allow_unicode=True)
+        conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
 
-        # Formatar data no padrão ISO 8601 com timezone (exigido pelo Hugo)
-        yaml_part['date'] = data_valida.replace(tzinfo=timezone.utc).isoformat()
-
-        # Garantir que o título existe
-        if 'title' not in yaml_part:
-            yaml_part['title'] = Path(relpath).stem
-
-        # Recriar o conteúdo com o front matter corrigido
-        try:
-            novo_yaml = yaml.dump(yaml_part, allow_unicode=True, sort_keys=False)
-            conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
-        except Exception as e:
-            print(f"⚠️ Erro ao serializar YAML: {e}")
-            continue
-
-        # Gravar arquivo de destino
+        # Gravar destino preservando subpastas
         destino = DEST_DIR / Path(relpath)
         destino.parent.mkdir(parents=True, exist_ok=True)
 
@@ -122,3 +103,4 @@ for relpath in paths:
             f.write(conteudo)
 
         print(f"✅ Nota exportada: {destino}")
+
