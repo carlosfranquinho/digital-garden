@@ -66,22 +66,22 @@ for relpath in paths:
     slug_map = copiar_e_slugificar_imagens(conteudo)
     conteudo = corrigir_imagens(conteudo, slug_map)
 
-# Corrigir data no front matter
-partes = conteudo.split('---')
-if len(partes) >= 3:
-    yaml_part = yaml.safe_load(partes[1])
-    data_original = yaml_part.get('date')
 
-    # Garantir que a data fica sempre sem aspas
-    yaml_part['date'] = data.strftime('%Y-%m-%dT%H:%M:%S')
+def corrigir_data(conteudo):
+    padrao = re.compile(r'^date:\s*(\d{2})-(\d{2})-(\d{4})(?:\s+(\d{2}):(\d{2}))?', re.MULTILINE)
 
-    novo_yaml = yaml.dump(yaml_part, allow_unicode=True, sort_keys=False, default_flow_style=False)
-    novo_yaml = re.sub(r"date: ['\"](.+?)['\"]", r'date: \1', novo_yaml)
+    def substituir(m):
+        dia, mes, ano = m.group(1), m.group(2), m.group(3)
+        hora, minuto = m.group(4) or "00", m.group(5) or "00"
+        return f"date: {ano}-{mes}-{dia}T{hora}:{minuto}:00"
 
-    conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
+    conteudo_corrigido = padrao.sub(substituir, conteudo)
+    
+    # Mostra resultado final para verificação
+    print("Data corrigida:", conteudo_corrigido)
+    
+    return conteudo_corrigido
 
-    # Print final para verificar como ficou a data enviada ao Hugo
-   print(f"Data enviada ao Hugo ({relpath}): {yaml_part['date']}")
 
     
     # Gravar destino preservando subpastas
