@@ -8,6 +8,7 @@ import re
 import yaml
 from pathlib import Path
 from slugify import slugify
+import argparse
 
 # Caminhos
 REPO_BASE = Path(__file__).resolve().parent.parent.parent
@@ -16,7 +17,6 @@ DEST_DIR = REPO_BASE / "content" / "post"
 ATTACHMENTS_DIR = Path.home() / "cinquenta" / "attachments"  # ajustar se necessário
 
 # Argumento
-import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', required=True, help="Ficheiro JSON com paths das notas a exportar")
 args = parser.parse_args()
@@ -77,8 +77,10 @@ for relpath in paths:
         novo_yaml = yaml.dump(yaml_part, allow_unicode=True)
         conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
 
-    # Gravar destino
-    destino = DEST_DIR / Path(relpath).name
+    # Gravar destino preservando subpastas
+    destino = DEST_DIR / Path(relpath)
+    destino.parent.mkdir(parents=True, exist_ok=True)
+
     with open(destino, 'w', encoding='utf-8') as f:
         f.write(conteudo)
 
