@@ -50,6 +50,25 @@ def copiar_e_slugificar_imagens(texto):
             print(f"Imagem não encontrada: {src}")
     return slug_map
 
+def corrigir_data(conteudo):
+    padrao = re.compile(r'^date:\s*(\d{2})-(\d{2})-(\d{4})(?:\s+(\d{2}):(\d{2}))?', re.MULTILINE)
+
+    def substituir(m):
+        dia, mes, ano = m.group(1), m.group(2), m.group(3)
+        hora, minuto = m.group(4) or "00", m.group(5) or "00"
+        return f"date: {ano}-{mes}-{dia}T{hora}:{minuto}:00"
+
+    return padrao.sub(substituir, conteudo)
+
+def gerar_nome_unico(dest_dir, nome_base):
+    destino = dest_dir / nome_base
+    contador = 1
+    while destino.exists():
+        nome_sem_ext, ext = os.path.splitext(nome_base)
+        destino = dest_dir / f"{nome_sem_ext}-{contador}{ext}"
+        contador += 1
+    return destino
+
 with open(args.input, 'r', encoding='utf-8') as f:
     paths = json.load(f)
 
@@ -65,28 +84,11 @@ for relpath in paths:
     conteudo = corrigir_links(conteudo)
     slug_map = copiar_e_slugificar_imagens(conteudo)
     conteudo = corrigir_imagens(conteudo, slug_map)
+    conteudo = corrigir_data(conteudo)
 
-
-def corrigir_data(conteudo):
-    padrao = re.compile(r'^date:\s*(\d{2})-(\d{2})-(\d{4})(?:\s+(\d{2}):(\d{2}))?', re.MULTILINE)
-
-    def substituir(m):
-        dia, mes, ano = m.group(1), m.group(2), m.group(3)
-        hora, minuto = m.group(4) or "00", m.group(5) or "00"
-        return f"date: {ano}-{mes}-{dia}T{hora}:{minuto}:00"
-
-    conteudo_corrigido = padrao.sub(substituir, conteudo)
-    
-    # Mostra resultado final para verificação
-    print("Data corrigida:", conteudo_corrigido)
-    
-    return conteudo_corrigido
-
-
-    
-    # Gravar destino preservando subpastas
-    destino = DEST_DIR / Path(relpath)
-    destino.parent.mkdir(parents=True, exist_ok=True)
+    DEST_DIR.mkdir(parents=True, exist_ok=True)
+    nome_ficheiro = Path(relpath).name
+    destino = gerar_nome_unico(DEST_DIR, nome_ficheiro)
 
     with open(destino, 'w', encoding='utf-8') as f:
         f.write(conteudo)
