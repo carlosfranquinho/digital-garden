@@ -1,9 +1,6 @@
 name: Deploy Digital Garden
 
 on:
-  push:
-    branches:
-      - main
   repository_dispatch:
     types: [obsidian-update]
 
@@ -18,13 +15,6 @@ jobs:
         with:
           token: ${{ secrets.GARDEN_TOKEN }}
 
-      - name: 🔄 Clonar notas do Obsidian
-        uses: actions/checkout@v3
-        with:
-          repository: carlosfranquinho/obsidian-vault
-          path: notas
-          token: ${{ secrets.GARDEN_TOKEN }}
-
       - name: 🐍 Instalar Python
         uses: actions/setup-python@v4
         with:
@@ -33,9 +23,26 @@ jobs:
       - name: 📦 Instalar dependências Python
         run: pip install pyyaml
 
+      - name: 📦 Preparar lista de notas recebidas
+        id: preparar
+        run: |
+          echo '${{ toJson(github.event.client_payload.notas) }}' > notas.json
+          jq -r '.[]' notas.json > paths.txt
+
+      - name: 🔄 Clonar apenas as notas necessárias
+        run: |
+          mkdir notas
+          cd notas
+          git init
+          git remote add origin https://x-access-token:${{ secrets.GARDEN_TOKEN }}@github.com/carlosfranquinho/obsidian-vault.git
+          git config core.sparseCheckout true
+          mkdir -p .git/info
+          cp ../paths.txt .git/info/sparse-checkout
+          git pull origin main
+
       - name: 📦 Executar script de exportação das notas
         run: |
-          python3 .github/scripts/exportar_obsidian.py
+          python3 .github/scripts/exportar_obsidian.py --input notas.json
 
       - name: 📦 Commit e Push de novas notas exportadas
         env:
