@@ -66,6 +66,10 @@ for relpath in paths:
     slug_map = copiar_e_slugificar_imagens(conteudo)
     conteudo = corrigir_imagens(conteudo, slug_map)
 
+import yaml
+import re
+from datetime import datetime
+
 # Corrigir data no front matter
 partes = conteudo.split('---')
 if len(partes) >= 3:
@@ -98,6 +102,7 @@ if len(partes) >= 3:
         else:
             raise TypeError(f"Tipo inesperado para data: {type(data_original)}")
 
+        # Formatar data para Hugo sem aspas
         yaml_part['date'] = data.strftime('%Y-%m-%dT%H:%M:%S')
 
     except Exception as e:
@@ -105,11 +110,15 @@ if len(partes) >= 3:
         mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
         yaml_part['date'] = mtime.strftime('%Y-%m-%dT%H:%M:%S')
 
-    novo_yaml = yaml.dump(yaml_part, allow_unicode=True, sort_keys=False)
+    novo_yaml = yaml.dump(yaml_part, allow_unicode=True, sort_keys=False, default_flow_style=False)
+
+    # Remover aspas da data caso tenham sido adicionadas pelo PyYAML
+    novo_yaml = re.sub(r"date: ['\"](.+?)['\"]", r'date: \1', novo_yaml)
+
     conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
 
-    # Debug final para ver exatamente o que foi escrito
-    print(f"Novo YAML para ({relpath}): {yaml_part}")
+    # Debug final para verificar o YAML gerado
+    print(f"Novo YAML para ({relpath}):\n{novo_yaml}")
     
     # Gravar destino preservando subpastas
     destino = DEST_DIR / Path(relpath)
