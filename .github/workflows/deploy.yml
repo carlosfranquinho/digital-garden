@@ -21,6 +21,15 @@ jobs:
         with:
           token: ${{ secrets.GARDEN_TOKEN }}
 
+      - name: 🕵️ Debug extra  # ← PASSO NOVO AQUI
+        run: |
+          echo "Verificando diretório:"
+          find . -type d -name "Publicações" -print
+          echo "Tentando acessar:"
+          python3 -c "import os; print(os.path.exists('Publicações/Teste pipeline.md'))"
+          echo "Estrutura completa:"
+          find . -name "*.md" -print
+
       - name: 🐍 Instalar Python
         uses: actions/setup-python@v4
         with:
