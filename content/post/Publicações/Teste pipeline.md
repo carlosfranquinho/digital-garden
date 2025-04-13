@@ -1,7 +1,7 @@
 ---
 title: Teste pipeline
 publish: true
-date: '2025-04-13T12:11:11'
+date: '2025-04-13T21:47:37.877254'
 tags: null
 ---
 
