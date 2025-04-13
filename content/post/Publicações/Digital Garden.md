@@ -1,7 +1,7 @@
 ---
 title: Digital Garden
 publish: true
-date: 2025-04-13T00:09:19Z
+date: 2025-04-13 00:09:19
 tags:
 - '#digital-garden'
 - '#conhecimento-vivo'
