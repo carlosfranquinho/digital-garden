@@ -90,9 +90,9 @@ for relpath in paths:
     with open(fonte, 'r', encoding='utf-8') as f:
         conteudo_original = f.read()
 
-    slug_map = copiar_e_slugificar_imagens(conteudo_original)
-    conteudo = substituir_imagens(conteudo_original, slug_map)
-    conteudo = corrigir_links(conteudo)
+    conteudo_links_corrigidos = corrigir_links(conteudo_original)
+    slug_map = copiar_e_slugificar_imagens(conteudo_links_corrigidos)
+    conteudo = substituir_imagens(conteudo_links_corrigidos, slug_map)
     conteudo = corrigir_data(conteudo)
 
     nome_final = slugify(Path(relpath).stem) + ".md"
