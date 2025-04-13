@@ -79,20 +79,30 @@ for relpath in paths:
         yaml_part = yaml.safe_load(partes[1])
 
         try:
-            if 'date' in yaml_part:
-                data_original = yaml_part['date']
-                formatos_validos = ["%Y-%m-%d", "%d-%m-%Y %H:%M", "%d-%m-%Y", "%Y-%m-%d %H:%M:%S"]
-                data = None
-                for formato in formatos_validos:
-                    try:
-                        data = datetime.strptime(data_original, formato)
-                        break
-                    except ValueError:
-                        continue
-                if data is None:
-                    data = datetime.fromisoformat(data_original)
+if 'date' in yaml_part:
+    data_original = yaml_part['date']
+    if isinstance(data_original, datetime):
+        data = data_original
+    else:
+        formatos_validos = ["%Y-%m-%d", "%d-%m-%Y %H:%M", "%d-%m-%Y", "%Y-%m-%d %H:%M:%S"]
+        data = None
+        for formato in formatos_validos:
+            try:
+                data = datetime.strptime(data_original, formato)
+                break
+            except ValueError:
+                continue
+        if data is None:
+            try:
+                data = datetime.fromisoformat(data_original)
+            except ValueError:
+                raise Exception(f"Formato de data inválido: {data_original}")
 
-                yaml_part['date'] = data.isoformat()
+    yaml_part['date'] = data.isoformat()
+else:
+    mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
+    yaml_part['date'] = mtime.isoformat()
+
             else:
                 mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
                 yaml_part['date'] = mtime.isoformat()
