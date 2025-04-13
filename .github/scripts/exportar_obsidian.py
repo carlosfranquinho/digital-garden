@@ -9,19 +9,20 @@ import yaml
 from pathlib import Path
 from slugify import slugify
 import argparse
+from datetime import datetime, timezone
 
-# Caminhos
+# Caminhos (mantidos como antes)
 REPO_BASE = Path(__file__).resolve().parent.parent.parent
 NOTAS_DIR = REPO_BASE / "notas"
 DEST_DIR = REPO_BASE / "content" / "post"
-ATTACHMENTS_DIR = Path.home() / "cinquenta" / "attachments"  # ajustar se necessário
+ATTACHMENTS_DIR = Path.home() / "cinquenta" / "attachments"
 
-# Argumento
+# Argumento (mantido como antes)
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', required=True, help="Ficheiro JSON com paths das notas a exportar")
 args = parser.parse_args()
 
-# Funções auxiliares
+# Funções auxiliares (mantidas como antes)
 def corrigir_links(texto):
     return re.sub(r"\[\[([^\|\]]+)(\|([^\]]+))?\]\]", r"[\3\1](\1.md)", texto)
 
@@ -48,7 +49,7 @@ def copiar_e_slugificar_imagens(texto):
             slug_map[nome] = dest_name
     return slug_map
 
-# Lê paths das notas a exportar
+# Lê paths das notas a exportar (mantido como antes)
 with open(args.input, 'r', encoding='utf-8') as f:
     paths = json.load(f)
 
@@ -68,36 +69,52 @@ for relpath in paths:
     slug_map = copiar_e_slugificar_imagens(conteudo)
     conteudo = corrigir_imagens(conteudo, slug_map, slug_map)
 
-    # Corrigir data no front matter (corrigir ou gerar nova)
+    # Processar front matter
     partes = conteudo.split('---')
     if len(partes) >= 3:
-        yaml_part = yaml.safe_load(partes[1])
+        try:
+            yaml_part = yaml.safe_load(partes[1])
+            if yaml_part is None:
+                yaml_part = {}
+        except yaml.YAMLError as e:
+            print(f"⚠️ Erro no YAML: {e}")
+            yaml_part = {}
 
-        from datetime import datetime
+        # Tratamento de data
         data_valida = None
-
+        
+        # Tentar obter data do front matter existente
         if 'date' in yaml_part:
             try:
-                # Tentar converter do formato Obsidian: "13-04-2025 20:30"
-                data_valida = datetime.strptime(yaml_part['date'], "%d-%m-%Y %H:%M")
-            except Exception:
-                try:
-                    # Tentar converter como ISO (caso já esteja ok)
+                # Formato Obsidian: "13-04-2025 20:30"
+                if isinstance(yaml_part['date'], str) and ' ' in yaml_part['date']:
+                    data_valida = datetime.strptime(yaml_part['date'], "%d-%m-%Y %H:%M")
+                # Já está em formato ISO
+                elif isinstance(yaml_part['date'], str):
                     data_valida = datetime.fromisoformat(yaml_part['date'])
-                except Exception as e:
-                    print(f"⚠️ Erro a interpretar data: {yaml_part['date']} → {e}")
-        
-        # Se não estava presente ou era inválida, gerar nova
+            except Exception as e:
+                print(f"⚠️ Erro a interpretar data: {yaml_part['date']} → {e}")
+
+        # Se não conseguiu obter data válida, usar data de modificação do arquivo
         if not data_valida:
             data_valida = datetime.fromtimestamp(fonte.stat().st_mtime)
 
-        yaml_part['date'] = data_valida.isoformat()
+        # Formatar data no padrão ISO 8601 com timezone (exigido pelo Hugo)
+        yaml_part['date'] = data_valida.replace(tzinfo=timezone.utc).isoformat()
+
+        # Garantir que o título existe
+        if 'title' not in yaml_part:
+            yaml_part['title'] = Path(relpath).stem
 
         # Recriar o conteúdo com o front matter corrigido
-        novo_yaml = yaml.dump(yaml_part, allow_unicode=True)
-        conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
+        try:
+            novo_yaml = yaml.dump(yaml_part, allow_unicode=True, sort_keys=False)
+            conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
+        except Exception as e:
+            print(f"⚠️ Erro ao serializar YAML: {e}")
+            continue
 
-        # Gravar destino preservando subpastas
+        # Gravar arquivo de destino
         destino = DEST_DIR / Path(relpath)
         destino.parent.mkdir(parents=True, exist_ok=True)
 
