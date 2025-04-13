@@ -69,38 +69,34 @@ for relpath in paths:
     slug_map = copiar_e_slugificar_imagens(conteudo)
     conteudo = corrigir_imagens(conteudo, slug_map, slug_map)
 
-    # Processar front matter
-    # Corrigir data no front matter se necessário
-    partes = conteudo.split('---')
-    if len(partes) >= 3:
-        yaml_part = yaml.safe_load(partes[1])
-        from datetime import datetime
+# Corrigir data no front matter se necessário
+partes = conteudo.split('---')
+if len(partes) >= 3:
+    yaml_part = yaml.safe_load(partes[1])
+    from datetime import datetime
 
+    try:
         if 'date' in yaml_part:
+            data_original = yaml_part['date']
+            # Tenta fazer parsing para vários formatos válidos
             try:
-                # Converte a data no formato "13-04-2025 20:30" para ISO
-                data_original = yaml_part['date']
-                data_convertida = datetime.strptime(data_original, "%d-%m-%Y %H:%M")
-                yaml_part['date'] = data_convertida.isoformat()
-            except Exception as e:
-                print(f"⚠️ Data inválida em '{relpath}': {e}")
-                # Substitui por data de modificação do ficheiro
-                mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
-                yaml_part['date'] = mtime.isoformat()
+                data = datetime.strptime(data_original, "%Y-%m-%d")
+            except ValueError:
+                try:
+                    data = datetime.strptime(data_original, "%d-%m-%Y %H:%M")
+                except ValueError:
+                    try:
+                        data = datetime.fromisoformat(data_original)
+                    except ValueError:
+                        raise Exception(f"Formato de data inválido: {data_original}")
+            yaml_part['date'] = data.isoformat()
         else:
-            # Se não houver campo 'date', usa a data de modificação do ficheiro
             mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
             yaml_part['date'] = mtime.isoformat()
+    except Exception as e:
+        print(f"⚠️ Erro ao tratar data em '{relpath}': {e}")
+        mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
+        yaml_part['date'] = mtime.isoformat()
 
-        novo_yaml = yaml.dump(yaml_part, allow_unicode=True)
-        conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
-
-        # Gravar destino preservando subpastas
-        destino = DEST_DIR / Path(relpath)
-        destino.parent.mkdir(parents=True, exist_ok=True)
-
-        with open(destino, 'w', encoding='utf-8') as f:
-            f.write(conteudo)
-
-        print(f"✅ Nota exportada: {destino}")
-
+    novo_yaml = yaml.dump(yaml_part, allow_unicode=True)
+    conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
