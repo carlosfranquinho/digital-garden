@@ -70,65 +70,20 @@ for relpath in paths:
 partes = conteudo.split('---')
 if len(partes) >= 3:
     yaml_part = yaml.safe_load(partes[1])
+    data_original = yaml_part.get('date')
 
-    try:
-        data_original = yaml_part.get('date')
-        print(f"Data original ({relpath}): {data_original} (tipo: {type(data_original)})")
+    # Garantir que a data fica sempre sem aspas
+    yaml_part['date'] = str(data_original)
 
-        if isinstance(data_original, datetime):
-            data = data_original
-        elif isinstance(data_original, str):
-            # Tenta parsear como datetime ISO primeiro
-            try:
-                data = datetime.fromisoformat(data_original.replace('Z', '+00:00'))
-            except ValueError:
-                # Se falhar, tenta outros formatos comuns
-                formatos_validos = [
-                    "%Y-%m-%dT%H:%M:%S%z",  # ISO com timezone
-                    "%Y-%m-%d %H:%M:%S%z",   # Espaço com timezone
-                    "%Y-%m-%dT%H:%M:%S",     # ISO sem timezone
-                    "%Y-%m-%d %H:%M:%S",     # Espaço sem timezone
-                    "%Y-%m-%d",              # Apenas data
-                    "%d-%m-%Y %H:%M:%S",     # Formato europeu
-                    "%d-%m-%Y %H:%M",
-                    "%d-%m-%Y"
-                ]
-                data = None
-                for formato in formatos_validos:
-                    try:
-                        data = datetime.strptime(data_original, formato)
-                        break
-                    except ValueError:
-                        continue
-                if data is None:
-                    raise ValueError(f"Nenhum formato válido corresponde a: {data_original}")
-
-        # Garantir que a data tenha timezone (UTC se não especificado)
-        if data.tzinfo is None:
-            data = data.replace(tzinfo=timezone.utc)
-        
-        # Formatar no padrão RFC 3339 que o Hugo requer
-        yaml_part['date'] = data.strftime('%Y-%m-%dT%H:%M:%SZ')
-
-    except Exception as e:
-        print(f"Erro crítico ao tratar data em '{relpath}': {e}")
-        # Usar data de modificação do arquivo como fallback
-        mtime = datetime.fromtimestamp(fonte.stat().st_mtime, tz=timezone.utc)
-        yaml_part['date'] = mtime.isoformat(timespec='seconds')
-
-    # Gerar YAML corretamente
-    novo_yaml = yaml.dump(
-        yaml_part,
-        allow_unicode=True,
-        sort_keys=False,
-        default_flow_style=False
-    )
-
-    # Remover aspas da data se o PyYAML tiver adicionado
+    novo_yaml = yaml.dump(yaml_part, allow_unicode=True, sort_keys=False, default_flow_style=False)
     novo_yaml = re.sub(r"date: ['\"](.+?)['\"]", r'date: \1', novo_yaml)
 
     conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
-    print(f"Conteúdo processado para {relpath}:\n{conteudo[:200]}...")  # Log parcial para debug    
+
+    # Print final para verificar como ficou a data enviada ao Hugo
+    print(f"Data enviada ao Hugo ({relpath}): {yaml_part['date']}")
+
+    
     # Gravar destino preservando subpastas
     destino = DEST_DIR / Path(relpath)
     destino.parent.mkdir(parents=True, exist_ok=True)
