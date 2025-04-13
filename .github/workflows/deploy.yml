@@ -21,8 +21,8 @@ jobs:
           python-version: '3.x'
 
       - name: 📦 Instalar dependências Python
-        run: pip install pyyaml python-slugify
-
+        run: python3 -m pip install --upgrade pip && python3 -m pip install pyyaml python-slugify
+  
       - name: 📦 Preparar lista de notas recebidas
         id: preparar
         run: |
