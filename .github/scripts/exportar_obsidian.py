@@ -73,11 +73,19 @@ if len(partes) >= 3:
 
     try:
         data_original = yaml_part.get('date')
+        print(f"Data original ({relpath}): {data_original} (tipo: {type(data_original)})")
 
         if isinstance(data_original, datetime):
             data = data_original
         elif isinstance(data_original, str):
-            formatos_validos = ["%Y-%m-%d", "%d-%m-%Y %H:%M", "%d-%m-%Y", "%Y-%m-%d %H:%M:%S"]
+            formatos_validos = [
+                "%Y-%m-%dT%H:%M:%S",
+                "%Y-%m-%d %H:%M:%S",
+                "%Y-%m-%d",
+                "%d-%m-%Y %H:%M:%S",
+                "%d-%m-%Y %H:%M",
+                "%d-%m-%Y"
+            ]
             data = None
             for formato in formatos_validos:
                 try:
@@ -86,23 +94,22 @@ if len(partes) >= 3:
                 except ValueError:
                     continue
             if data is None:
-                data = datetime.fromisoformat(data_original)
+                raise ValueError(f"Nenhum formato válido corresponde a: {data_original}")
         else:
-            raise ValueError(f"Tipo de data inválido: {type(data_original)}")
+            raise TypeError(f"Tipo inesperado para data: {type(data_original)}")
 
-        # Aqui está a correção definitiva para o Hugo
         yaml_part['date'] = data.strftime('%Y-%m-%dT%H:%M:%S')
 
     except Exception as e:
-        print(f"Erro ao tratar data em '{relpath}': {e}")
+        print(f"Erro crítico ao tratar data em '{relpath}': {e}")
         mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
         yaml_part['date'] = mtime.strftime('%Y-%m-%dT%H:%M:%S')
 
     novo_yaml = yaml.dump(yaml_part, allow_unicode=True, sort_keys=False)
     conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
 
-    destino = DEST_DIR / relpath
-    destino.parent.mkdir(parents=True, exist_ok=True)
+    # Debug final para ver exatamente o que foi escrito
+    print(f"Novo YAML para ({relpath}): {yaml_part}")
 
     with open(destino, 'w', encoding='utf-8') as f:
         f.write(conteudo)
