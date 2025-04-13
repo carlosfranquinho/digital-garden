@@ -11,7 +11,7 @@ jobs:
 
     steps:
     
-      - name: 🪵 Debug: Ver conteúdo recebido
+      - name: 🪵 Debug Ver conteúdo recebido
         run: |
           echo "Payload recebido:"
           echo '${{ toJson(github.event.client_payload.notas) }}'
