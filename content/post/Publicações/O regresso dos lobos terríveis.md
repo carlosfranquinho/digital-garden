@@ -10,7 +10,7 @@ tags:
 ---
 
 
-Na semana passada, a empresa Colossal Biosciences anunciou o nascimento de três lobos geneticamente modificados com traços físicos semelhantes aos extintos *direwolves* (lobos-terríveis, *Aenocyon dirus*), popularizados pela série *Game of Thrones*, mas que existiram de facto na América do Norte até há cerca de 10.000 anos.
+Na semana passada, a empresa Colossal Biosciences anunciou o nascimento de três lobos geneticamente modificados com traços físicos semelhantes aos extintos *direwolves* (lobos-terríveis, *Aenocyon dirus*), popularizados pela série *Game of Thrones*, mas que existiram de facto na América do Norte até há cerca de 10.000 anos..
 
 Os filhotes — batizados Romulus, Remus e Khaleesi — resultam de um processo de edição genética aplicado a lobos-cinzentos modernos (*Canis lupus*), com o objetivo de replicar características morfológicas do lobo-terrível: tamanho maior, pelagem espessa e mandíbula mais robusta.
 
