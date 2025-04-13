@@ -66,43 +66,39 @@ for relpath in paths:
     slug_map = copiar_e_slugificar_imagens(conteudo)
     conteudo = corrigir_imagens(conteudo, slug_map)
 
-    partes = conteudo.split('---')
-    if len(partes) >= 3:
-        yaml_part = yaml.safe_load(partes[1])
-        print(f"\nNota: {relpath}")
-        print(f"Original YAML: {yaml_part}")
+# Corrigir data no front matter
+partes = conteudo.split('---')
+if len(partes) >= 3:
+    yaml_part = yaml.safe_load(partes[1])
 
-        try:
-            if 'date' in yaml_part:
-                data_original = yaml_part['date']
-                print(f"Data original: {data_original}")
+    try:
+        data_original = yaml_part.get('date')
 
-                formatos_validos = ["%Y-%m-%d", "%d-%m-%Y %H:%M", "%d-%m-%Y", "%Y-%m-%d %H:%M:%S"]
-                data = None
-                for formato in formatos_validos:
-                    try:
-                        data = datetime.strptime(data_original, formato)
-                        break
-                    except ValueError:
-                        continue
+        if isinstance(data_original, datetime):
+            data = data_original
+        elif isinstance(data_original, str):
+            formatos_validos = ["%Y-%m-%d", "%d-%m-%Y %H:%M", "%d-%m-%Y", "%Y-%m-%d %H:%M:%S"]
+            data = None
+            for formato in formatos_validos:
+                try:
+                    data = datetime.strptime(data_original, formato)
+                    break
+                except ValueError:
+                    continue
+            if data is None:
+                data = datetime.fromisoformat(data_original)
+        else:
+            raise ValueError(f"Tipo de data inválido: {type(data_original)}")
 
-                if data is None:
-                    data = datetime.fromisoformat(data_original)
+        yaml_part['date'] = data.isoformat()
 
-                yaml_part['date'] = data.isoformat()
-                print(f"Data após processamento: {yaml_part['date']}")
-            else:
-                mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
-                yaml_part['date'] = mtime.isoformat()
-                print(f"Data definida via mtime: {yaml_part['date']}")
+    except Exception as e:
+        print(f"Erro ao tratar data em '{relpath}': {e}")
+        mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
+        yaml_part['date'] = mtime.isoformat()
 
-        except Exception as e:
-            print(f"Erro ao tratar data em '{relpath}': {e}")
-            mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
-            yaml_part['date'] = mtime.isoformat()
-
-        novo_yaml = yaml.dump(yaml_part, allow_unicode=True, sort_keys=False)
-        conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
+    novo_yaml = yaml.dump(yaml_part, allow_unicode=True, sort_keys=False)
+    conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
 
     destino = DEST_DIR / relpath
     destino.parent.mkdir(parents=True, exist_ok=True)
