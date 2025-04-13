@@ -73,7 +73,7 @@ if len(partes) >= 3:
     data_original = yaml_part.get('date')
 
     # Garantir que a data fica sempre sem aspas
-    yaml_part['date'] = str(data_original)
+    yaml_part['date'] = data.strftime('%Y-%m-%dT%H:%M:%S')
 
     novo_yaml = yaml.dump(yaml_part, allow_unicode=True, sort_keys=False, default_flow_style=False)
     novo_yaml = re.sub(r"date: ['\"](.+?)['\"]", r'date: \1', novo_yaml)
@@ -81,7 +81,7 @@ if len(partes) >= 3:
     conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
 
     # Print final para verificar como ficou a data enviada ao Hugo
-    print(f"Data enviada ao Hugo ({relpath}): {yaml_part['date']}")
+   print(f"Data enviada ao Hugo ({relpath}): {yaml_part['date']}")
 
     
     # Gravar destino preservando subpastas
