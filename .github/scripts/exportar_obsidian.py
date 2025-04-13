@@ -108,7 +108,7 @@ if len(partes) >= 3:
             data = data.replace(tzinfo=timezone.utc)
         
         # Formatar no padrão RFC 3339 que o Hugo requer
-        yaml_part['date'] = data.isoformat(timespec='seconds')
+        yaml_part['date'] = data.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     except Exception as e:
         print(f"Erro crítico ao tratar data em '{relpath}': {e}")
