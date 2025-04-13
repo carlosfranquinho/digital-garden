@@ -1,7 +1,7 @@
 ---
 title: O regresso dos lobos-terríveis?
 publish: true
-date: 2025-04-11T00:09:19
+date: 2025-04-11T00:09:19+00:00
 tags:
 - genética
 - desextinção
