@@ -90,12 +90,13 @@ if len(partes) >= 3:
         else:
             raise ValueError(f"Tipo de data inválido: {type(data_original)}")
 
-        yaml_part['date'] = data.isoformat()
+        # Aqui está a correção definitiva para o Hugo
+        yaml_part['date'] = data.strftime('%Y-%m-%dT%H:%M:%S')
 
     except Exception as e:
         print(f"Erro ao tratar data em '{relpath}': {e}")
         mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
-        yaml_part['date'] = mtime.isoformat()
+        yaml_part['date'] = mtime.strftime('%Y-%m-%dT%H:%M:%S')
 
     novo_yaml = yaml.dump(yaml_part, allow_unicode=True, sort_keys=False)
     conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
