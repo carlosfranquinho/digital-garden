@@ -66,10 +66,6 @@ for relpath in paths:
     slug_map = copiar_e_slugificar_imagens(conteudo)
     conteudo = corrigir_imagens(conteudo, slug_map)
 
-import yaml
-import re
-from datetime import datetime
-
 # Corrigir data no front matter
 partes = conteudo.split('---')
 if len(partes) >= 3:
@@ -82,43 +78,54 @@ if len(partes) >= 3:
         if isinstance(data_original, datetime):
             data = data_original
         elif isinstance(data_original, str):
-            formatos_validos = [
-                "%Y-%m-%dT%H:%M:%S",
-                "%Y-%m-%d %H:%M:%S",
-                "%Y-%m-%d",
-                "%d-%m-%Y %H:%M:%S",
-                "%d-%m-%Y %H:%M",
-                "%d-%m-%Y"
-            ]
-            data = None
-            for formato in formatos_validos:
-                try:
-                    data = datetime.strptime(data_original, formato)
-                    break
-                except ValueError:
-                    continue
-            if data is None:
-                raise ValueError(f"Nenhum formato válido corresponde a: {data_original}")
-        else:
-            raise TypeError(f"Tipo inesperado para data: {type(data_original)}")
-
-        # Formatar data para Hugo sem aspas
-        yaml_part['date'] = data.strftime('%Y-%m-%dT%H:%M:%S')
+            # Primeiro tenta parsear como datetime ISO
+            try:
+                data = datetime.fromisoformat(data_original.replace('Z', '+00:00'))
+            except ValueError:
+                # Se falhar, tenta outros formatos
+                formatos_validos = [
+                    "%Y-%m-%dT%H:%M:%S%z",
+                    "%Y-%m-%d %H:%M:%S%z",
+                    "%Y-%m-%d",
+                    "%d-%m-%Y %H:%M:%S",
+                    "%d-%m-%Y %H:%M",
+                    "%d-%m-%Y"
+                ]
+                data = None
+                for formato in formatos_validos:
+                    try:
+                        data = datetime.strptime(data_original, formato)
+                        break
+                    except ValueError:
+                        continue
+                if data is None:
+                    raise ValueError(f"Nenhum formato válido corresponde a: {data_original}")
+        
+        # Formatar data no padrão RFC 3339 exigido pelo Hugo
+        # Adiciona timezone UTC se não tiver
+        if data.tzinfo is None:
+            data = data.replace(tzinfo=timezone.utc)
+        yaml_part['date'] = data.isoformat(timespec='seconds')
 
     except Exception as e:
         print(f"Erro crítico ao tratar data em '{relpath}': {e}")
-        mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
-        yaml_part['date'] = mtime.strftime('%Y-%m-%dT%H:%M:%S')
+        mtime = datetime.fromtimestamp(fonte.stat().st_mtime, tz=timezone.utc)
+        yaml_part['date'] = mtime.isoformat(timespec='seconds')
 
-    novo_yaml = yaml.dump(yaml_part, allow_unicode=True, sort_keys=False, default_flow_style=False)
-
-    # Remover aspas da data caso tenham sido adicionadas pelo PyYAML
-    novo_yaml = re.sub(r"date: ['\"](.+?)['\"]", r'date: \1', novo_yaml)
-
-    conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
+    # Garantir que o YAML seja gerado corretamente
+    novo_yaml = yaml.dump(
+        yaml_part,
+        allow_unicode=True,
+        sort_keys=False,
+        default_flow_style=False,
+        explicit_start=False,
+        explicit_end=False
+    )
 
     # Debug final para verificar o YAML gerado
-    print(f"Novo YAML para ({relpath}):\n{novo_yaml}")
+    print(f"Novo YAML para ({relpath}):\n---\n{novo_yaml}---")
+
+    conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
     
     # Gravar destino preservando subpastas
     destino = DEST_DIR / Path(relpath)
