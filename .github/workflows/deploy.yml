@@ -57,7 +57,7 @@ jobs:
 
       - name: 📦 Executar script de exportação das notas
         run: |
-          python3 .github/scripts/exportar_obsidian.py --input notas.json
+          python3 .github/scripts/exportar_obsidian.py --input notas.json --vault ${{ github.workspace }}/obsidian-vault
 
       - name: 📦 Commit e Push de novas notas exportadas
         env:
