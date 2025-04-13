@@ -1,8 +1,8 @@
 ---
-date: '2025-04-13T21:08:25.420362'
-publish: true
-tags: null
 title: Teste pipeline
+publish: true
+date: '2025-04-13T21:12:40.356403+00:00'
+tags: null
 ---
 
 

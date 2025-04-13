@@ -1,12 +1,12 @@
 ---
-date: '2025-04-13T21:08:25.420362'
+title: Digital Garden
 publish: true
+date: '2025-04-13T21:12:40.356403+00:00'
 tags:
 - '#digital-garden'
 - '#conhecimento-vivo'
 - '#notas-ligadas'
 - '#aprendizagem-contínua'
-title: Digital Garden
 ---
 
 # O que é um digital garden?
