@@ -11,22 +11,23 @@ from slugify import slugify
 import argparse
 from datetime import datetime, timezone
 
-# Caminhos (mantidos como antes)
+# Caminhos
 REPO_BASE = Path(__file__).resolve().parent.parent.parent
 NOTAS_DIR = REPO_BASE / "notas"
 DEST_DIR = REPO_BASE / "content" / "post"
 ATTACHMENTS_DIR = Path.home() / "cinquenta" / "attachments"
+STATIC_IMG_DIR = REPO_BASE / "static" / "img"
 
-# Argumento (mantido como antes)
+# Argumento
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', required=True, help="Ficheiro JSON com paths das notas a exportar")
 args = parser.parse_args()
 
-# Funções auxiliares (mantidas como antes)
+# Funções auxiliares
 def corrigir_links(texto):
     return re.sub(r"\[\[([^\|\]]+)(\|([^\]]+))?\]\]", r"[\3\1](\1.md)", texto)
 
-def corrigir_imagens(texto, imagens_copiadas, slug_map):
+def corrigir_imagens(texto, slug_map):
     def substitui(match):
         path = match.group(1).strip()
         nome_original = Path(path).name
@@ -44,12 +45,15 @@ def copiar_e_slugificar_imagens(texto):
         src = ATTACHMENTS_DIR / nome
         if src.exists():
             dest_name = slugify(nome)
-            dest_path = REPO_BASE / "static" / "img" / dest_name
+            dest_path = STATIC_IMG_DIR / dest_name
+            dest_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, dest_path)
             slug_map[nome] = dest_name
+        else:
+            print(f"⚠️ Imagem não encontrada: {src}")
     return slug_map
 
-# Lê paths das notas a exportar (mantido como antes)
+# Ler paths das notas
 with open(args.input, 'r', encoding='utf-8') as f:
     paths = json.load(f)
 
@@ -67,36 +71,44 @@ for relpath in paths:
 
     # Copiar imagens e gerar shortcodes
     slug_map = copiar_e_slugificar_imagens(conteudo)
-    conteudo = corrigir_imagens(conteudo, slug_map, slug_map)
+    conteudo = corrigir_imagens(conteudo, slug_map)
 
-# Corrigir data no front matter se necessário
-partes = conteudo.split('---')
-if len(partes) >= 3:
-    yaml_part = yaml.safe_load(partes[1])
-    from datetime import datetime
+    # Corrigir data no front matter
+    partes = conteudo.split('---')
+    if len(partes) >= 3:
+        yaml_part = yaml.safe_load(partes[1])
 
-    try:
-        if 'date' in yaml_part:
-            data_original = yaml_part['date']
-            # Tenta fazer parsing para vários formatos válidos
-            try:
-                data = datetime.strptime(data_original, "%Y-%m-%d")
-            except ValueError:
-                try:
-                    data = datetime.strptime(data_original, "%d-%m-%Y %H:%M")
-                except ValueError:
+        try:
+            if 'date' in yaml_part:
+                data_original = yaml_part['date']
+                formatos_validos = ["%Y-%m-%d", "%d-%m-%Y %H:%M", "%d-%m-%Y", "%Y-%m-%d %H:%M:%S"]
+                data = None
+                for formato in formatos_validos:
                     try:
-                        data = datetime.fromisoformat(data_original)
+                        data = datetime.strptime(data_original, formato)
+                        break
                     except ValueError:
-                        raise Exception(f"Formato de data inválido: {data_original}")
-            yaml_part['date'] = data.isoformat()
-        else:
+                        continue
+                if data is None:
+                    data = datetime.fromisoformat(data_original)
+
+                yaml_part['date'] = data.isoformat()
+            else:
+                mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
+                yaml_part['date'] = mtime.isoformat()
+        except Exception as e:
+            print(f"⚠️ Erro ao tratar data em '{relpath}': {e}")
             mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
             yaml_part['date'] = mtime.isoformat()
-    except Exception as e:
-        print(f"⚠️ Erro ao tratar data em '{relpath}': {e}")
-        mtime = datetime.fromtimestamp(fonte.stat().st_mtime)
-        yaml_part['date'] = mtime.isoformat()
 
-    novo_yaml = yaml.dump(yaml_part, allow_unicode=True)
-    conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
+        novo_yaml = yaml.dump(yaml_part, allow_unicode=True, sort_keys=False)
+        conteudo = f"---\n{novo_yaml}---\n{partes[2]}"
+
+    # Escrever nota corrigida para DEST_DIR
+    destino = DEST_DIR / relpath
+    destino.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(destino, 'w', encoding='utf-8') as f:
+        f.write(conteudo)
+
+    print(f"✅ Processado: {relpath}")
