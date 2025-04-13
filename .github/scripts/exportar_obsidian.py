@@ -24,15 +24,16 @@ args = parser.parse_args()
 def corrigir_links(texto):
     return re.sub(r"\[\[([^\|\]]+)(\|([^\]]+))?\]\]", r"[\3\1](\1.md)", texto)
 
+from urllib.parse import quote
+
 def corrigir_imagens(texto, slug_map):
-    def substitui(match):
-        path = match.group(1).strip()
-        nome_original = Path(path).name
-        nome_slug = slug_map.get(nome_original)
-        if nome_slug:
-            return f'{{{{< taped src="/img/{nome_slug}" alt="{slugify(nome_original)}" >}}}}'
-        return ''
-    return re.sub(r'!\[\[(.*?)\]\]', substitui, texto)
+    def sub_md(match):
+        nome = match.group(1).strip()
+        slug = slug_map.get(nome, nome)
+        return f'{{{{< taped src="/imagens/{quote(slug)}" alt="{nome}" >}}}}'
+    texto = re.sub(r'!\[.*?\]\((.*?)\)', sub_md, texto)
+    texto = re.sub(r'!\[\[(.*?)\]\]', sub_md, texto)
+    return texto
 
 def copiar_e_slugificar_imagens(texto):
     imagens = re.findall(r'!\[\[(.*?)\]\]', texto)
