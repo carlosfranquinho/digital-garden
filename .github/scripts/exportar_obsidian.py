@@ -20,7 +20,6 @@ args = parser.parse_args()
 
 # Diretórios base
 VAULT_DIR = Path(args.vault).resolve()
-ATTACHMENTS_DIR = VAULT_DIR / "attachments"
 REPO_BASE = Path(__file__).resolve().parent.parent.parent
 DEST_DIR = REPO_BASE / "content" / "post"
 STATIC_IMG_DIR = REPO_BASE / "static" / "imagens"
@@ -42,29 +41,53 @@ def corrigir_links(conteudo):
 def substituir_imagens(conteudo, slug_map):
     def sub_md(m):
         nome = m.group(1).strip()
-        slug = slug_map.get(nome, nome)
-        return f'{{{{< taped src="/imagens/{quote(slug)}" alt="{slugify(nome)}" >}}}}'
+        # Extrai apenas o nome do arquivo sem caminho
+        nome_arquivo = Path(nome).name
+        slug = slug_map.get(nome_arquivo, nome_arquivo)
+        return f'{{{{< taped src="/imagens/{quote(slug)}" alt="{slugify(nome_arquivo)}" >}}}}'
 
     conteudo = re.sub(r'!\[.*?\]\((.*?)\)', sub_md, conteudo)
     conteudo = re.sub(r'!\[\[(.*?)\]\]', sub_md, conteudo)
     return conteudo
 
-# Copiar imagens
-def copiar_e_slugificar_imagens(texto):
+# Encontrar e copiar imagens
+def copiar_e_slugificar_imagens(texto, nota_path):
     imagens = re.findall(r'!\[\[(.*?)\]\]', texto) + re.findall(r'!\[.*?\]\((.*?)\)', texto)
     slug_map = {}
+    
     for img in imagens:
-        nome = Path(img).name
-        src = ATTACHMENTS_DIR / nome
-        if src.exists():
-            slug = slugify(os.path.splitext(nome)[0]) + os.path.splitext(nome)[1].lower()
-            dest = STATIC_IMG_DIR / slug
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, dest)
-            slug_map[nome] = slug
-            print(f"📸 Imagem copiada: {nome} → {slug}")
-        else:
-            print(f"⚠️ Imagem não encontrada: {src}")
+        img = img.strip()
+        # Tentar encontrar a imagem em vários locais possíveis
+        possiveis_locais = [
+            VAULT_DIR / img,  # Caminho absoluto
+            VAULT_DIR / nota_path.parent / img,  # Relativo à nota
+            VAULT_DIR / "attachments" / img,  # Na pasta attachments
+            VAULT_DIR / "attachments" / Path(img).name,  # Apenas o nome do arquivo em attachments
+            VAULT_DIR / nota_path.parent / Path(img).name  # Apenas o nome do arquivo no mesmo diretório
+        ]
+        
+        encontrado = False
+        for src in possiveis_locais:
+            if src.exists():
+                nome = src.name
+                # Slugify mantendo a extensão original
+                nome_base, extensao = os.path.splitext(nome)
+                slug = slugify(nome_base) + extensao.lower()
+                dest = STATIC_IMG_DIR / slug
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                
+                try:
+                    shutil.copy2(src, dest)
+                    slug_map[nome] = slug
+                    print(f"📸 Imagem copiada: {src} → {dest}")
+                    encontrado = True
+                    break
+                except Exception as e:
+                    print(f"⚠️ Erro ao copiar imagem {src}: {e}")
+        
+        if not encontrado:
+            print(f"⚠️ Imagem não encontrada: {img} (procurado em: {', '.join(str(p) for p in possiveis_locais)})")
+    
     return slug_map
 
 # Corrigir datas no front matter
@@ -91,7 +114,7 @@ for relpath in paths:
         conteudo_original = f.read()
 
     conteudo_links_corrigidos = corrigir_links(conteudo_original)
-    slug_map = copiar_e_slugificar_imagens(conteudo_links_corrigidos)
+    slug_map = copiar_e_slugificar_imagens(conteudo_links_corrigidos, fonte)
     conteudo = substituir_imagens(conteudo_links_corrigidos, slug_map)
     conteudo = corrigir_data(conteudo)
 
