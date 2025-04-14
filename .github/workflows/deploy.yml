@@ -28,7 +28,7 @@ jobs:
 
       - name: 📂 Processar arquivos
         run: |
-          # Função de slugificação melhorada
+          # Função de slugification
           slugify() {
             echo "$1" | 
             iconv -t ascii//TRANSLIT |
@@ -38,33 +38,26 @@ jobs:
             sed 's/-$//;s/^-//;s/[^a-z0-9\-]//g'
           }
 
-          # Clonar repositório fonte
           git clone https://${{ github.actor }}:${{ secrets.GARDEN_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
 
-          # Processar cada arquivo
           jq -r '.[]' notas.json | while read -r original; do
             if [[ "$original" == *.md ]]; then
-              # Slugificar caminho completo
               dirpath=$(dirname "$original" | slugify)
               filename=$(basename "$original" .md | slugify)
               new_path="content/posts/${dirpath}/${filename}.md"
               
-              # Criar diretório e copiar arquivo
               mkdir -p "$(dirname "$new_path")"
               cp "/tmp/obsidian-vault/$original" "$new_path"
-              
-              # Atualizar links de imagens
               sed -i -E 's|!\[\[(attachments/)?([^]]+)\]\]|![](/imagens/\2)|g' "$new_path"
               echo "📄 Nota processada: $original → $new_path"
 
             elif [[ "$original" == attachments/* ]]; then
-              # Copiar imagem mantendo nome original (sem slug)
               filename=$(basename "$original")
               cp "/tmp/obsidian-vault/$original" "static/imagens/$filename"
               echo "🖼️ Imagem copiada: $filename"
             fi
           done
-          
+
       - name: 🛠️ Instalar Hugo
         uses: peaceiris/actions-hugo@v2
         with:
@@ -75,7 +68,7 @@ jobs:
         run: hugo --minify
 
       - name: 📡 Fazer deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@4.3.4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4  # Corrigido: 'v' antes da versão
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
