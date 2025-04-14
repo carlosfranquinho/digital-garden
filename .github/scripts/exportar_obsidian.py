@@ -16,7 +16,7 @@ REPO_BASE = Path(__file__).resolve().parent.parent.parent
 NOTAS_DIR = REPO_BASE / "notas"
 DEST_DIR = REPO_BASE / "content" / "post"
 ATTACHMENTS_DIR = Path.home() / "cinquenta" / "attachments"
-STATIC_IMG_DIR = REPO_BASE / "static" / "img"
+STATIC_IMG_DIR = REPO_BASE / "static" / "imagens"
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', required=True)
@@ -55,14 +55,14 @@ def copiar_e_renomear_imagens(texto, nome_nota_slug):
             print(f"⚠️ Imagem não encontrada: {src}")
     return slug_map
 
-    def corrigir_imagens(texto, slug_map):
+def corrigir_imagens(texto, slug_map):
     def substitui(match):
         path = match.group(1).strip()
         nome_original = Path(path).name
         nome_novo = slug_map.get(nome_original)
         if nome_novo:
             alt_text = nome_novo.rsplit('.', 1)[0].replace('_', ' ')
-            return f'{{{{< taped src="/img/{nome_novo}" alt="{alt_text}" >}}}}'
+            return f'{{{{< taped src="/imagens/{nome_novo}" alt="{alt_text}" >}}}}'
         return ''
     return re.sub(r'!\[\[(.*?)\]\]', substitui, texto)
 
