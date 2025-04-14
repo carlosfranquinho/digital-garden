@@ -9,36 +9,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Baixar o repositório principal (com o tema incluído)
-      - name: 🚀 Checkout Completo
+      # 1. Checkout do próprio repositório (com permissão para push)
+      - name: 🚀 Checkout com Permissão
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Para baixar todo o histórico (incluindo submódulos se houver)
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      # 2. Clonar Obsidian Vault
-      - name: 📥 Clonar Vault
+      # 2. Receber payload do Obsidian
+      - name: 📥 Processar Payload
+        id: payload
         run: |
-          git clone https://${{ github.actor }}:${{ secrets.GARDEN_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
           echo '${{ toJSON(github.event.client_payload.notas) }}' > /tmp/notas.json
+          echo "📋 Arquivos recebidos:"
+          cat /tmp/notas.json
 
-      # 3. Limpeza Segura (preserva temas e configurações)
-      - name: 🧹 Limpar Conteúdo Antigo
+      # 3. Limpar apenas os diretórios alvo
+      - name: 🧹 Limpar Diretórios Alvo
         run: |
-          # Mantém estrutura essencial
-          find . -mindepth 1 \( \
-             -name '.git' \
-             -o -name '.github' \
-             -o -name 'config.toml' \
-             -o -name 'themes' \
-             -o -name 'static' \
-          \) -prune -o -exec rm -rf {} +
-          
-          # Recria diretórios necessários
+          rm -rf content/posts/*
+          rm -rf static/imagens/*
           mkdir -p content/posts static/imagens
 
-      # 4. Processar Arquivos
-      - name: 📂 Copiar Conteúdo
+      # 4. Processar e copiar novos arquivos
+      - name: 📂 Importar Conteúdo
         run: |
+          # Clonar vault temporariamente
+          git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
+
+          # Slugify function
           slugify() {
             echo "$1" | 
             iconv -t ascii//TRANSLIT |
@@ -48,7 +47,8 @@ jobs:
             sed 's/-$//;s/^-//;s/[^a-z0-9\-]//g'
           }
 
-          while IFS= read -r original; do
+          # Processar cada arquivo
+          jq -r '.[]' /tmp/notas.json | while read -r original; do
             if [[ "$original" == *.md ]]; then
               novo_nome="content/posts/$(slugify "$original")"
               mkdir -p "$(dirname "$novo_nome")"
@@ -60,28 +60,19 @@ jobs:
               cp "/tmp/obsidian-vault/$original" "static/imagens/$(basename "$original")"
               echo "🖼️ $(basename "$original")"
             fi
-          done < <(jq -r '.[]' /tmp/notas.json)
+          done
 
-      # 5. Verificar Estrutura (DEBUG)
-      - name: 🔍 Verificar Arquivos
-        run: |
-          echo "=== Estrutura Final ==="
-          find . -maxdepth 3 -not -path './.git/*'
-          echo "=== Tema ==="
-          ls -la themes/github-style
-
-      # 6. Build Hugo
+      # 5. Build com Hugo
       - name: 🛠️ Instalar Hugo
         uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: 'latest'
           extended: true
 
-      - name: 📦 Construir Site
-        run: |
-          hugo --minify --source .
+      - name: 📦 Gerar Site
+        run: hugo --minify
 
-      # 7. Deploy
+      # 6. Deploy via FTP
       - name: 📡 FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
@@ -90,3 +81,12 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ${{ secrets.FTP_PATH }}
           local-dir: public/
+
+      # 7. Atualizar repositório com novo conteúdo
+      - name: 🔄 Commitar Mudanças
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add content/posts static/imagens
+          git commit -m "Atualização automática: conteúdo do Obsidian [skip ci]"
+          git push
