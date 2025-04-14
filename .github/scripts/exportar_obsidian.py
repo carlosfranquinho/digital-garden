@@ -34,31 +34,37 @@ if DEST_DIR.exists():
 def corrigir_links(texto):
     return re.sub(r"\[\[([^\|\]]+)(\|([^\]]+))?\]\]", r"[\3\1](\1.md)", texto)
 
-def corrigir_imagens(texto, slug_map):
-    def substitui(match):
-        path = match.group(1).strip()
-        nome_original = Path(path).name
-        nome_slug = slug_map.get(nome_original)
-        if nome_slug:
-            return f'{{{{< taped src="/img/{nome_slug}" alt="{slugify(nome_original)}" >}}}}'
-        return ''
-    return re.sub(r'!\[\[(.*?)\]\]', substitui, texto)
-
-def copiar_e_slugificar_imagens(texto):
+def copiar_e_renomear_imagens(texto, nome_nota_slug):
     imagens = re.findall(r'!\[\[(.*?)\]\]', texto)
     slug_map = {}
-    for img in imagens:
+    vistos = {}
+    for idx, img in enumerate(imagens, start=1):
         nome = Path(img).name
+        if nome in slug_map:
+            continue  # já processado
+
         src = ATTACHMENTS_DIR / nome
         if src.exists():
-            dest_name = slugify(nome)
+            ext = Path(nome).suffix
+            dest_name = f"{nome_nota_slug}_{idx}{ext}"
             dest_path = STATIC_IMG_DIR / dest_name
             dest_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, dest_path)
             slug_map[nome] = dest_name
         else:
-            print(f"Imagem não encontrada: {src}")
+            print(f"⚠️ Imagem não encontrada: {src}")
     return slug_map
+
+    def corrigir_imagens(texto, slug_map):
+    def substitui(match):
+        path = match.group(1).strip()
+        nome_original = Path(path).name
+        nome_novo = slug_map.get(nome_original)
+        if nome_novo:
+            alt_text = nome_novo.rsplit('.', 1)[0].replace('_', ' ')
+            return f'{{{{< taped src="/img/{nome_novo}" alt="{alt_text}" >}}}}'
+        return ''
+    return re.sub(r'!\[\[(.*?)\]\]', substitui, texto)
 
 def corrigir_data(conteudo):
     padrao = re.compile(r'^date:\s*(\d{2})-(\d{2})-(\d{4})(?:\s+(\d{2}):(\d{2}))?', re.MULTILINE)
@@ -88,8 +94,9 @@ for relpath in paths:
     with open(fonte, 'r', encoding='utf-8') as f:
         conteudo = f.read()
 
+    nome_nota_slug = slugify(Path(relpath).stem)
     conteudo = corrigir_links(conteudo)
-    slug_map = copiar_e_slugificar_imagens(conteudo)
+    slug_map = copiar_e_renomear_imagens(conteudo, nome_nota_slug)
     conteudo = corrigir_imagens(conteudo, slug_map)
     conteudo = corrigir_data(conteudo)
 
