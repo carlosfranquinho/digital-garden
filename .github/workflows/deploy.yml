@@ -15,61 +15,56 @@ jobs:
       - name: 📥 Process payload
         id: payload
         run: |
-          # Converter payload para JSON
           echo '${{ toJSON(github.event.client_payload.notas) }}' > notas.json
-          echo "📋 Payload recebido:"
+          echo "📋 Lista de arquivos recebida:"
           cat notas.json
 
       - name: 🧹 Limpar diretórios
         run: |
           rm -rf content/posts/*
-          rm -rf static/images/*
+          rm -rf static/imagens/*
           mkdir -p content/posts
-          mkdir -p static/images
+          mkdir -p static/imagens
 
       - name: 📂 Processar arquivos
-        env:
-          FILES: ${{ steps.payload.outputs.files }}
         run: |
-          # Clonar repositório fonte
-          git clone https://${{ github.actor }}:${{ secrets.GARDEN_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
-
-          # Slugify function
+          # Função de slugificação melhorada
           slugify() {
             echo "$1" | 
             iconv -t ascii//TRANSLIT |
-            tr -d "'" |
+            tr -d "'\"" |
             tr -s '[:space:][:punct:]' '-' |
             tr '[:upper:]' '[:lower:]' |
-            sed 's/-$//;s/^-//'
+            sed 's/-$//;s/^-//;s/[^a-z0-9\-]//g'
           }
+
+          # Clonar repositório fonte
+          git clone https://${{ github.actor }}:${{ secrets.GARDEN_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
 
           # Processar cada arquivo
           jq -r '.[]' notas.json | while read -r original; do
             if [[ "$original" == *.md ]]; then
-              # Slugificar nome do arquivo
-              filename=$(basename "$original" .md)
-              dirpath=$(dirname "$original")
-              slug=$(slugify "$filename")
-              new_path="content/posts/$(slugify "$dirpath")/${slug}.md"
+              # Slugificar caminho completo
+              dirpath=$(dirname "$original" | slugify)
+              filename=$(basename "$original" .md | slugify)
+              new_path="content/posts/${dirpath}/${filename}.md"
               
               # Criar diretório e copiar arquivo
               mkdir -p "$(dirname "$new_path")"
               cp "/tmp/obsidian-vault/$original" "$new_path"
               
-              # Atualizar links de imagens no markdown
-              sed -i -E "s|!\[\[attachments/([^]]+)\]\]|![](/images/\1)|g" "$new_path"
-              echo "📄 Processado: $original → $new_path"
+              # Atualizar links de imagens
+              sed -i -E 's|!\[\[(attachments/)?([^]]+)\]\]|![](/imagens/\2)|g' "$new_path"
+              echo "📄 Nota processada: $original → $new_path"
 
             elif [[ "$original" == attachments/* ]]; then
-              # Copiar imagens mantendo nome original (ou slugificar se preferir)
+              # Copiar imagem mantendo nome original (sem slug)
               filename=$(basename "$original")
-              cp "/tmp/obsidian-vault/$original" "static/images/$filename"
-              echo "🖼️ Copiada imagem: $filename"
+              cp "/tmp/obsidian-vault/$original" "static/imagens/$filename"
+              echo "🖼️ Imagem copiada: $filename"
             fi
           done
 
-      # [Mantém os passos do Hugo e FTP abaixo]
       - name: 🛠️ Instalar Hugo
         uses: peaceiris/actions-hugo@v2
         with:
@@ -80,7 +75,7 @@ jobs:
         run: hugo --minify
 
       - name: 📡 Fazer deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        uses: SamKirkland/FTP-Deploy-Action@4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
