@@ -2,81 +2,68 @@ name: Process and Deploy Digital Garden
 
 on:
   repository_dispatch:
-    types: [deploy-garden]
+    types: [obsidian-update]  # Alterado para corresponder ao seu trigger
 
 jobs:
   process-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Passo 1: Cancelar execuções anteriores
       - name: 🛑 Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.11.0
 
-      # Passo 2: Fazer checkout do repositório digital-garden
       - name: 🚀 Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Passo 3: Processar o payload recebido
       - name: 📥 Process payload data
         id: payload
         run: |
-          # Converter o payload para formato JSON
-          PAYLOAD='${{ toJSON(github.event.client_payload) }}'
-          
-          # Extrair a lista de ficheiros
-          FILES=$(echo "$PAYLOAD" | jq -r '.payload[]')
-          
-          # Salvar para uso nos próximos passos
+          # Adaptado para o formato do obsidian-vault (client_payload.notas)
+          FILES='${{ toJSON(github.event.client_payload.notas) }}'
           echo "files=${FILES}" >> $GITHUB_OUTPUT
           echo "$FILES" > filelist.txt
+          echo "📋 Ficheiros recebidos: ${FILES}"
 
-      # Passo 4: Limpar diretórios antigos
-      - name: 🧹 Clean up directories
+      - name: � Clean up directories
         run: |
           rm -rf content/posts/*
           rm -rf static/images/*
           mkdir -p content/posts
           mkdir -p static/images
 
-      # Passo 5: Clonar o obsidian-vault e copiar os ficheiros
       - name: 📂 Copy files from obsidian-vault
         env:
           FILES: ${{ steps.payload.outputs.files }}
         run: |
-          # Clonar o repositório com as notas
           git clone https://github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
           
-          # Processar cada ficheiro do payload
-          while IFS= read -r file; do
+          # Processar cada ficheiro
+          jq -r '.[]' filelist.txt | while read -r file; do
             if [[ "$file" == *.md ]]; then
-              # Criar diretório se não existir e copiar o ficheiro markdown
               mkdir -p "content/posts/$(dirname "$file")"
               cp "/tmp/obsidian-vault/$file" "content/posts/$file"
-              
-              # Corrigir caminhos de imagens no markdown
               sed -i 's|!\[\[attachments/|![](/images/|g' "content/posts/$file"
+              echo "📄 Copiada nota: $file"
             elif [[ "$file" == attachments/* ]]; then
-              # Copiar anexos para o diretório de imagens
               filename=$(basename "$file")
               cp "/tmp/obsidian-vault/$file" "static/images/$filename"
+              echo "🖼️ Copiada imagem: $filename"
             fi
-          done < filelist.txt
+          done
 
-      # Passo 6: Instalar e executar o Hugo
-      - name: 🛠️ Install Hugo
+      # [Mantém os passos existentes de Hugo e FTP abaixo]
+      - name: 🛠️ Instalar Hugo
         uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: 'latest'
           extended: true
 
-      - name: 📦 Build site with Hugo
+      - name: 📦 Gerar site com Hugo
         run: hugo --minify
 
-      # Passo 7: Fazer deploy via FTP
-      - name: 📡 Deploy via FTP
+      - name: 📡 Fazer deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
