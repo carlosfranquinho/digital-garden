@@ -6,6 +6,7 @@ import json
 import shutil
 import re
 import yaml
+import mimetypes
 from pathlib import Path
 from slugify import slugify
 import argparse
@@ -69,15 +70,7 @@ def corrigir_data(conteudo):
 
     return padrao.sub(substituir, conteudo)
 
-def gerar_nome_unico(dest_dir, nome_base):
-    destino = dest_dir / nome_base
-    contador = 1
-    while destino.exists():
-        nome_sem_ext, ext = os.path.splitext(nome_base)
-        destino = dest_dir / f"{nome_sem_ext}-{contador}{ext}"
-        contador += 1
-    return destino
-
+# Começar a processar
 with open(args.input, 'r', encoding='utf-8') as f:
     paths = json.load(f)
 
@@ -85,6 +78,11 @@ for relpath in paths:
     fonte = NOTAS_DIR / relpath
     if not fonte.exists():
         print(f"Nota não encontrada: {fonte}")
+        continue
+
+    tipo, _ = mimetypes.guess_type(fonte)
+    if tipo and not tipo.startswith("text/"):
+        print(f"📦 Ignorado (não é ficheiro de texto): {fonte}")
         continue
 
     with open(fonte, 'r', encoding='utf-8') as f:
@@ -97,7 +95,7 @@ for relpath in paths:
 
     DEST_DIR.mkdir(parents=True, exist_ok=True)
     nome_ficheiro = Path(relpath).name
-    destino = gerar_nome_unico(DEST_DIR, nome_ficheiro)
+    destino = DEST_DIR / nome_ficheiro
 
     with open(destino, 'w', encoding='utf-8') as f:
         f.write(conteudo)
