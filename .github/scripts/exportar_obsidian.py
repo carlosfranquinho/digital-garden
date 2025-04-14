@@ -37,7 +37,6 @@ def corrigir_links(texto):
 def copiar_e_renomear_imagens(texto, nome_nota_slug):
     imagens = re.findall(r'!\[\[(.*?)\]\]', texto)
     slug_map = {}
-    vistos = {}
     for idx, img in enumerate(imagens, start=1):
         nome = Path(img).name
         if nome in slug_map:
@@ -83,9 +82,33 @@ with open(args.input, 'r', encoding='utf-8') as f:
 for relpath in paths:
     fonte = NOTAS_DIR / relpath
     if not fonte.exists():
-        print(f"Nota não encontrada: {fonte}")
+        print(f"⚠️ Ficheiro não encontrado: {fonte}")
         continue
 
+    ext = Path(fonte).suffix.lower()
+    if ext in [".png", ".jpg", ".jpeg", ".gif", ".webp"]:
+        # Copiar imagem solta com nome transformado
+        nome_imagem = Path(fonte).name
+        src = ATTACHMENTS_DIR / nome_imagem
+        if src.exists():
+            # Deduzir nome da nota a partir do ficheiro anterior na lista
+            i = paths.index(relpath)
+            nota_anterior = next((p for p in reversed(paths[:i]) if p.endswith(".md")), None)
+            if nota_anterior:
+                nome_nota_slug = slugify(Path(nota_anterior).stem)
+                contador = sum(1 for x in paths[:i+1] if x.endswith(Path(fonte).name))
+                dest_name = f"{nome_nota_slug}_{contador}{ext}"
+                dest_path = STATIC_IMG_DIR / dest_name
+                dest_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, dest_path)
+                print(f"🖼️ Imagem copiada: {src} → {dest_path}")
+            else:
+                print(f"⚠️ Imagem {src} ignorada (sem nota anterior)")
+        else:
+            print(f"⚠️ Imagem listada mas não encontrada: {src}")
+        continue
+
+    # Se não for imagem, assume que é uma nota
     tipo, _ = mimetypes.guess_type(fonte)
     if tipo and not tipo.startswith("text/"):
         print(f"📦 Ignorado (não é ficheiro de texto): {fonte}")
