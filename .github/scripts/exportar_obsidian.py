@@ -10,125 +10,87 @@ from pathlib import Path
 from slugify import slugify
 import argparse
 from datetime import datetime, timezone
-from urllib.parse import quote
 
-# Argumentos do script
+REPO_BASE = Path(__file__).resolve().parent.parent.parent
+NOTAS_DIR = REPO_BASE / "notas"
+DEST_DIR = REPO_BASE / "content" / "post"
+ATTACHMENTS_DIR = Path.home() / "cinquenta" / "attachments"
+STATIC_IMG_DIR = REPO_BASE / "static" / "img"
+
 parser = argparse.ArgumentParser()
-parser.add_argument('--input', required=True)  # ficheiro .json com lista de notas
-parser.add_argument('--vault', required=True)  # caminho absoluto para o repositório obsidian-vault
+parser.add_argument('--input', required=True)
 args = parser.parse_args()
 
-# Diretórios base
-VAULT_DIR = Path(args.vault).resolve()
-REPO_BASE = Path(__file__).resolve().parent.parent.parent
-DEST_DIR = REPO_BASE / "content" / "post"
-STATIC_IMG_DIR = REPO_BASE / "static" / "imagens"
+def corrigir_links(texto):
+    return re.sub(r"\[\[([^\|\]]+)(\|([^\]]+))?\]\]", r"[\3\1](\1.md)", texto)
 
-# Corrigir links internos [[...]]
-def corrigir_links(conteudo):
-    def format_link(link_text):
-        link_text = link_text.strip().strip('"').strip("'")
-        if '|' in link_text:
-            target, alias = link_text.split('|', 1)
-        else:
-            target = alias = link_text
-        slug = slugify(target)
-        return f"[{alias.strip()}](/post/{slug})"
+def corrigir_imagens(texto, slug_map):
+    def substitui(match):
+        path = match.group(1).strip()
+        nome_original = Path(path).name
+        nome_slug = slug_map.get(nome_original)
+        if nome_slug:
+            return f'{{{{< taped src="/img/{nome_slug}" alt="{slugify(nome_original)}" >}}}}'
+        return ''
+    return re.sub(r'!\[\[(.*?)\]\]', substitui, texto)
 
-    return re.sub(r'(?<!\!)\[\[(.+?)\]\]', lambda m: format_link(m.group(1)), conteudo)
-
-# Substituir imagens
-def substituir_imagens(conteudo, slug_map):
-    def sub_md(m):
-        nome = m.group(1).strip()
-        # Extrai apenas o nome do arquivo sem caminho
-        nome_arquivo = Path(nome).name
-        slug = slug_map.get(nome_arquivo, nome_arquivo)
-        return f'{{{{< taped src="/imagens/{quote(slug)}" alt="{slugify(nome_arquivo)}" >}}}}'
-
-    conteudo = re.sub(r'!\[.*?\]\((.*?)\)', sub_md, conteudo)
-    conteudo = re.sub(r'!\[\[(.*?)\]\]', sub_md, conteudo)
-    return conteudo
-
-# Encontrar e copiar imagens
-def copiar_e_slugificar_imagens(texto, nota_path):
-    imagens = re.findall(r'!\[\[(.*?)\]\]', texto) + re.findall(r'!\[.*?\]\((.*?)\)', texto)
+def copiar_e_slugificar_imagens(texto):
+    imagens = re.findall(r'!\[\[(.*?)\]\]', texto)
     slug_map = {}
-    
     for img in imagens:
-        img = img.strip()
-        # Tentar encontrar a imagem em vários locais possíveis
-        possiveis_locais = [
-            VAULT_DIR / img,  # Caminho absoluto
-            VAULT_DIR / nota_path.parent / img,  # Relativo à nota
-            VAULT_DIR / "attachments" / img,  # Na pasta attachments
-            VAULT_DIR / "attachments" / Path(img).name,  # Apenas o nome do arquivo em attachments
-            VAULT_DIR / nota_path.parent / Path(img).name  # Apenas o nome do arquivo no mesmo diretório
-        ]
-        
-        encontrado = False
-        for src in possiveis_locais:
-            if src.exists():
-                nome = src.name
-                # Slugify mantendo a extensão original
-                nome_base, extensao = os.path.splitext(nome)
-                slug = slugify(nome_base) + extensao.lower()
-                dest = STATIC_IMG_DIR / slug
-                dest.parent.mkdir(parents=True, exist_ok=True)
-                
-                try:
-                    shutil.copy2(src, dest)
-                    slug_map[nome] = slug
-                    print(f"📸 Imagem copiada: {src} → {dest}")
-                    encontrado = True
-                    break
-                except Exception as e:
-                    print(f"⚠️ Erro ao copiar imagem {src}: {e}")
-        
-        if not encontrado:
-            print(f"⚠️ Imagem não encontrada: {img} (procurado em: {', '.join(str(p) for p in possiveis_locais)})")
-    
+        nome = Path(img).name
+        src = ATTACHMENTS_DIR / nome
+        if src.exists():
+            dest_name = slugify(nome)
+            dest_path = STATIC_IMG_DIR / dest_name
+            dest_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dest_path)
+            slug_map[nome] = dest_name
+        else:
+            print(f"Imagem não encontrada: {src}")
     return slug_map
 
-# Corrigir datas no front matter
 def corrigir_data(conteudo):
     padrao = re.compile(r'^date:\s*(\d{2})-(\d{2})-(\d{4})(?:\s+(\d{2}):(\d{2}))?', re.MULTILINE)
+
     def substituir(m):
         dia, mes, ano = m.group(1), m.group(2), m.group(3)
         hora, minuto = m.group(4) or "00", m.group(5) or "00"
         return f"date: {ano}-{mes}-{dia}T{hora}:{minuto}:00"
+
     return padrao.sub(substituir, conteudo)
 
-# Ler lista de ficheiros
+def gerar_nome_unico(dest_dir, nome_base):
+    destino = dest_dir / nome_base
+    contador = 1
+    while destino.exists():
+        nome_sem_ext, ext = os.path.splitext(nome_base)
+        destino = dest_dir / f"{nome_sem_ext}-{contador}{ext}"
+        contador += 1
+    return destino
+
 with open(args.input, 'r', encoding='utf-8') as f:
     paths = json.load(f)
 
-# Processar cada nota
 for relpath in paths:
-    fonte = VAULT_DIR / relpath
+    fonte = NOTAS_DIR / relpath
     if not fonte.exists():
-        print(f"❌ Nota não encontrada: {fonte}")
+        print(f"Nota não encontrada: {fonte}")
         continue
 
     with open(fonte, 'r', encoding='utf-8') as f:
-        conteudo_original = f.read()
+        conteudo = f.read()
 
-    conteudo_links_corrigidos = corrigir_links(conteudo_original)
-    slug_map = copiar_e_slugificar_imagens(conteudo_links_corrigidos, fonte)
-    conteudo = substituir_imagens(conteudo_links_corrigidos, slug_map)
+    conteudo = corrigir_links(conteudo)
+    slug_map = copiar_e_slugificar_imagens(conteudo)
+    conteudo = corrigir_imagens(conteudo, slug_map)
     conteudo = corrigir_data(conteudo)
 
-    nome_final = slugify(Path(relpath).stem) + ".md"
-    destino = DEST_DIR / nome_final
-    destino.parent.mkdir(parents=True, exist_ok=True)
-
-    if destino.exists():
-        with open(destino, 'r', encoding='utf-8') as f:
-            existente = f.read()
-        if existente == conteudo:
-            print(f"⏩ Sem alterações: {nome_final}")
-            continue
+    DEST_DIR.mkdir(parents=True, exist_ok=True)
+    nome_ficheiro = Path(relpath).name
+    destino = gerar_nome_unico(DEST_DIR, nome_ficheiro)
 
     with open(destino, 'w', encoding='utf-8') as f:
         f.write(conteudo)
-    print(f"✅ Nota exportada: {nome_final}")
+
+    print(f"✅ Nota exportada: {destino}")
