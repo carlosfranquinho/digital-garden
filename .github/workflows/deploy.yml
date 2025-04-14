@@ -27,9 +27,9 @@ jobs:
       # 3. Limpar apenas os diretórios alvo
       - name: 🧹 Limpar Diretórios Alvo
         run: |
-          rm -rf content/posts/*
+          rm -rf content/post/*
           rm -rf static/imagens/*
-          mkdir -p content/posts static/imagens
+          mkdir -p content/post static/imagens
 
       # 4. Processar e copiar novos arquivos
       - name: 📂 Importar Conteúdo
@@ -50,7 +50,7 @@ jobs:
           # Processar cada arquivo
           jq -r '.[]' /tmp/notas.json | while read -r original; do
             if [[ "$original" == *.md ]]; then
-              novo_nome="content/posts/$(slugify "$original")"
+              novo_nome="content/post/$(slugify "$original")"
               mkdir -p "$(dirname "$novo_nome")"
               cp "/tmp/obsidian-vault/$original" "$novo_nome"
               sed -i -E 's|!\[\[(attachments/)?([^]]+)\]\]|![](/imagens/\2)|g' "$novo_nome"
@@ -87,6 +87,6 @@ jobs:
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add content/posts static/imagens
+          git add content/post static/imagens
           git commit -m "Atualização automática: conteúdo do Obsidian [skip ci]"
           git push
