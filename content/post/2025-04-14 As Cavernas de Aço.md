@@ -32,7 +32,7 @@ tags:
 
 ---
 
-**Publicado originalmente em 1954 e traduzido em Portugal na mítica coleção Argonauta (nº 37), _As Cavernas de Aço_ é uma fusão engenhosa entre o policial clássico e a ficção científica visionária.** Com esta obra, Isaac Asimov inaugura um dos seus universos mais fascinantes: o dos robôs e da sua complexa relação com a humanidade. 
+**Publicado originalmente em 1954 e traduzido em Portugal na mítica coleção Argonauta (nº 37), _As Cavernas de Aço_ é uma curiosa fusão entre o policial clássico e a ficção científica visionária.** Com esta obra, Isaac Asimov inaugura um dos seus universos mais fascinantes: o dos robôs e da sua complexa relação com a humanidade.
 
 ![Pasted image 20250414160649.jpg](Pasted image 20250414160649.jpg.md)
 ## Uma distopia claustrofóbica e atual
