@@ -21,6 +21,15 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--input', required=True)
 args = parser.parse_args()
 
+# Limpar notas antigas
+if DEST_DIR.exists():
+    for item in DEST_DIR.iterdir():
+        if item.is_file():
+            item.unlink()
+        elif item.is_dir():
+            shutil.rmtree(item)
+    print(f"🧹 Pasta limpa: {DEST_DIR}")
+
 def corrigir_links(texto):
     return re.sub(r"\[\[([^\|\]]+)(\|([^\]]+))?\]\]", r"[\3\1](\1.md)", texto)
 
