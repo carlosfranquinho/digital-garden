@@ -9,12 +9,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Baixar o digital-garden (limpo)
-      - name: 🚀 Checkout Limpo
+      # 1. Baixar o repositório principal (com o tema incluído)
+      - name: 🚀 Checkout Completo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          path: digital-garden
+          fetch-depth: 0  # Para baixar todo o histórico (incluindo submódulos se houver)
 
       # 2. Clonar Obsidian Vault
       - name: 📥 Clonar Vault
@@ -22,19 +21,24 @@ jobs:
           git clone https://${{ github.actor }}:${{ secrets.GARDEN_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
           echo '${{ toJSON(github.event.client_payload.notas) }}' > /tmp/notas.json
 
-      # 3. Limpeza Radical
-      - name: 💥 Limpar Tudo
+      # 3. Limpeza Segura (preserva temas e configurações)
+      - name: 🧹 Limpar Conteúdo Antigo
         run: |
-          cd digital-garden
-          # Mantém apenas .git, .github e config.toml
-          find . -mindepth 1 \( -name '.git' -o -name '.github' -o -name 'config.toml' \) -prune -o -exec rm -rf {} +
+          # Mantém estrutura essencial
+          find . -mindepth 1 \( \
+             -name '.git' \
+             -o -name '.github' \
+             -o -name 'config.toml' \
+             -o -name 'themes' \
+             -o -name 'static' \
+          \) -prune -o -exec rm -rf {} +
+          
+          # Recria diretórios necessários
           mkdir -p content/posts static/imagens
 
       # 4. Processar Arquivos
       - name: 📂 Copiar Conteúdo
         run: |
-          cd digital-garden
-          
           slugify() {
             echo "$1" | 
             iconv -t ascii//TRANSLIT |
@@ -61,25 +65,23 @@ jobs:
       # 5. Verificar Estrutura (DEBUG)
       - name: 🔍 Verificar Arquivos
         run: |
-          cd digital-garden
           echo "=== Estrutura Final ==="
-          find . -type f
-          echo "=== config.toml ==="
-          cat config.toml || echo "Arquivo config.toml não encontrado!"
+          find . -maxdepth 3 -not -path './.git/*'
+          echo "=== Tema ==="
+          ls -la themes/github-style
 
-      # 6. Build com Hugo
+      # 6. Build Hugo
       - name: 🛠️ Instalar Hugo
         uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: 'latest'
           extended: true
 
-      - name: 📦 Gerar Site
+      - name: 📦 Construir Site
         run: |
-          cd digital-garden
           hugo --minify --source .
 
-      # 7. Deploy FTP
+      # 7. Deploy
       - name: 📡 FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
@@ -87,4 +89,4 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ${{ secrets.FTP_PATH }}
-          local-dir: digital-garden/public/
+          local-dir: public/
