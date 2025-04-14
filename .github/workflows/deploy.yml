@@ -9,32 +9,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Baixar APENAS o digital-garden (sem merge)
+      # 1. Baixar o digital-garden (limpo)
       - name: 🚀 Checkout Limpo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          clean: true
           path: digital-garden
 
-      # 2. Baixar o obsidian-vault separadamente
-      - name: 📥 Clonar Obsidian Vault
+      # 2. Clonar Obsidian Vault
+      - name: 📥 Clonar Vault
         run: |
           git clone https://${{ github.actor }}:${{ secrets.GARDEN_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
+          echo '${{ toJSON(github.event.client_payload.notas) }}' > /tmp/notas.json
 
-      # 3. Limpar TUDO exceto .git
-      - name: 💥 Limpeza Nuclear
+      # 3. Limpeza Radical
+      - name: 💥 Limpar Tudo
         run: |
           cd digital-garden
-          find . -mindepth 1 -not -path './.git*' -delete
+          # Mantém apenas .git, .github e config.toml
+          find . -mindepth 1 \( -name '.git' -o -name '.github' -o -name 'config.toml' \) -prune -o -exec rm -rf {} +
           mkdir -p content/posts static/imagens
 
-      # 4. Processar arquivos
-      - name: 📂 Copiar Notas/Imagens
+      # 4. Processar Arquivos
+      - name: 📂 Copiar Conteúdo
         run: |
           cd digital-garden
           
-          # Slugify function
           slugify() {
             echo "$1" | 
             iconv -t ascii//TRANSLIT |
@@ -44,8 +44,7 @@ jobs:
             sed 's/-$//;s/^-//;s/[^a-z0-9\-]//g'
           }
 
-          # Processar cada arquivo
-          jq -r '.[]' /tmp/notas.json | while read -r original; do
+          while IFS= read -r original; do
             if [[ "$original" == *.md ]]; then
               novo_nome="content/posts/$(slugify "$original")"
               mkdir -p "$(dirname "$novo_nome")"
@@ -57,15 +56,18 @@ jobs:
               cp "/tmp/obsidian-vault/$original" "static/imagens/$(basename "$original")"
               echo "🖼️ $(basename "$original")"
             fi
-          done
+          done < <(jq -r '.[]' /tmp/notas.json)
 
-      - name: 🔍 Verificar Estrutura
+      # 5. Verificar Estrutura (DEBUG)
+      - name: 🔍 Verificar Arquivos
         run: |
           cd digital-garden
-          echo "Estrutura final:"
-          find content/posts static/imagens -type f
+          echo "=== Estrutura Final ==="
+          find . -type f
+          echo "=== config.toml ==="
+          cat config.toml || echo "Arquivo config.toml não encontrado!"
 
-      # 5. Build e Deploy
+      # 6. Build com Hugo
       - name: 🛠️ Instalar Hugo
         uses: peaceiris/actions-hugo@v2
         with:
@@ -75,8 +77,9 @@ jobs:
       - name: 📦 Gerar Site
         run: |
           cd digital-garden
-          hugo --minify
+          hugo --minify --source .
 
+      # 7. Deploy FTP
       - name: 📡 FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
