@@ -9,26 +9,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🚀 Checkout repo
+      - name: 🚀 Checkout com limpeza FORÇADA
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          clean: true  # ← Isso é CRUCIAL para limpar totalmente
 
-      - name: 📥 Process payload
+      - name: 💥 Remover conteúdo antigo (FORÇADO)
+        run: |
+          # Destruir tudo exceto .git e outros essenciais
+          shopt -s dotglob extglob
+          rm -rf !(.git|.github|.gitignore|.gitattributes)
+          mkdir -p content/posts static/imagens
+
+      - name: 📥 Processar payload
         id: payload
         run: |
           echo '${{ toJSON(github.event.client_payload.notas) }}' > notas.json
-          echo "📋 Lista de arquivos recebida:"
+          echo "📋 Lista recebida:"
           cat notas.json
 
-      - name: 🧹 Limpar diretórios
+      - name: 📂 Copiar novos arquivos
         run: |
-          rm -rf content/posts/*
-          rm -rf static/imagens/*
-          mkdir -p content/posts
-          mkdir -p static/imagens
+          git clone https://${{ github.actor }}:${{ secrets.GARDEN_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
 
-      - name: 📂 Processar arquivos
-        run: |
-          # Função de slugification
+          # Slugification robusta
           slugify() {
             echo "$1" | 
             iconv -t ascii//TRANSLIT |
@@ -38,26 +43,21 @@ jobs:
             sed 's/-$//;s/^-//;s/[^a-z0-9\-]//g'
           }
 
-          git clone https://${{ github.actor }}:${{ secrets.GARDEN_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
-
           jq -r '.[]' notas.json | while read -r original; do
             if [[ "$original" == *.md ]]; then
-              dirpath=$(dirname "$original" | slugify)
-              filename=$(basename "$original" .md | slugify)
-              new_path="content/posts/${dirpath}/${filename}.md"
-              
-              mkdir -p "$(dirname "$new_path")"
-              cp "/tmp/obsidian-vault/$original" "$new_path"
-              sed -i -E 's|!\[\[(attachments/)?([^]]+)\]\]|![](/imagens/\2)|g' "$new_path"
-              echo "📄 Nota processada: $original → $new_path"
+              novo_nome="content/posts/$(slugify "$original")"
+              mkdir -p "$(dirname "$novo_nome")"
+              cp "/tmp/obsidian-vault/$original" "$novo_nome"
+              sed -i -E 's|!\[\[(attachments/)?([^]]+)\]\]|![](/imagens/\2)|g' "$novo_nome"
+              echo "📄 $original → $novo_nome"
 
             elif [[ "$original" == attachments/* ]]; then
-              filename=$(basename "$original")
-              cp "/tmp/obsidian-vault/$original" "static/imagens/$filename"
-              echo "🖼️ Imagem copiada: $filename"
+              cp "/tmp/obsidian-vault/$original" "static/imagens/$(basename "$original")"
+              echo "🖼️ $(basename "$original")"
             fi
           done
 
+      # ... (mantenha os passos do Hugo e FTP abaixo)
       - name: 🛠️ Instalar Hugo
         uses: peaceiris/actions-hugo@v2
         with:
