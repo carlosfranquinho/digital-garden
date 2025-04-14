@@ -9,33 +9,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout do próprio repositório (com permissão para push)
-      - name: 🚀 Checkout com Permissão
+      # 1. Checkout do repositório principal
+      - name: 🚀 Checkout Digital Garden
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      # 2. Receber payload do Obsidian
-      - name: 📥 Processar Payload
+      # 2. Processar payload
+      - name: 📥 Receber Conteúdo
         id: payload
         run: |
           echo '${{ toJSON(github.event.client_payload.notas) }}' > /tmp/notas.json
-          echo "📋 Arquivos recebidos:"
+          echo "📋 Conteúdo recebido:"
           cat /tmp/notas.json
 
-      # 3. Limpar apenas os diretórios alvo
-      - name: 🧹 Limpar Diretórios Alvo
+      # 3. Limpar diretórios alvo (corrigido para content/post)
+      - name: 🧹 Limpar Diretórios
         run: |
           rm -rf content/post/*
           rm -rf static/imagens/*
           mkdir -p content/post static/imagens
 
-      # 4. Processar e copiar novos arquivos
-      - name: 📂 Importar Conteúdo
+      # 4. Importar conteúdo do Obsidian (com tratamento de erro)
+      - name: 📂 Importar Notas e Imagens
         run: |
-          # Clonar vault temporariamente
-          git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
+          # Verificar se o vault existe
+          if ! git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault 2>/dev/null; then
+            echo "::error::Repositório obsidian-vault não encontrado ou inacessível"
+            exit 1
+          fi
 
           # Slugify function
           slugify() {
@@ -47,7 +50,7 @@ jobs:
             sed 's/-$//;s/^-//;s/[^a-z0-9\-]//g'
           }
 
-          # Processar cada arquivo
+          # Processar arquivos
           jq -r '.[]' /tmp/notas.json | while read -r original; do
             if [[ "$original" == *.md ]]; then
               novo_nome="content/post/$(slugify "$original")"
@@ -72,7 +75,7 @@ jobs:
       - name: 📦 Gerar Site
         run: hugo --minify
 
-      # 6. Deploy via FTP
+      # 6. Deploy FTP
       - name: 📡 FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
@@ -82,11 +85,11 @@ jobs:
           server-dir: ${{ secrets.FTP_PATH }}
           local-dir: public/
 
-      # 7. Atualizar repositório com novo conteúdo
+      # 7. Atualizar repositório
       - name: 🔄 Commitar Mudanças
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add content/post static/imagens
-          git commit -m "Atualização automática: conteúdo do Obsidian [skip ci]"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Atualização automática: conteúdo do Obsidian [skip ci]"
           git push
