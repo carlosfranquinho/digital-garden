@@ -27,7 +27,7 @@ tags:
 - **Coleção**: Argonauta nº 37
 - **Editora**: Livros do Brasil
 - **Ano de publicação (original)**: 1954
-- **Ano da edição lida**: 1956
+- **Ano da edição lida**: 1956 
 - **Formato**: capa mole
 
 ---
