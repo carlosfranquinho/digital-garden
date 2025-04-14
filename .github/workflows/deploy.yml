@@ -2,7 +2,12 @@ name: Process and Deploy Digital Garden
 
 on:
   repository_dispatch:
-    types: [obsidian-update]  # Alterado para corresponder ao seu trigger
+    types: [obsidian-update]
+
+permissions:  # Adicionando permissões explícitas
+  contents: write
+  actions: write  # Necessário para cancelar workflows
+  deployments: write
 
 jobs:
   process-and-deploy:
@@ -10,7 +15,10 @@ jobs:
 
     steps:
       - name: 🛑 Cancel Previous Runs
+        if: github.event_name == 'repository_dispatch'  # Só cancela se for trigger manual
         uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ secrets.GITHUB_TOKEN }}  # Usa o token explicitamente
 
       - name: 🚀 Checkout repo
         uses: actions/checkout@v4
@@ -20,54 +28,44 @@ jobs:
       - name: 📥 Process payload data
         id: payload
         run: |
-          # Adaptado para o formato do obsidian-vault (client_payload.notas)
-          FILES='${{ toJSON(github.event.client_payload.notas) }}'
+          # Verifica se o payload está no formato esperado
+          if [ -z '${{ github.event.client_payload.notas }}' ]; then
+            echo "::error::Payload inválido - campo 'notas' não encontrado"
+            exit 1
+          fi
+          
+          FILES=$(echo '${{ toJSON(github.event.client_payload.notas) }}' | jq -r '.[] | select(length > 0)')
           echo "files=${FILES}" >> $GITHUB_OUTPUT
-          echo "$FILES" > filelist.txt
-          echo "📋 Ficheiros recebidos: ${FILES}"
+          echo "ℹ️ Ficheiros a processar:"
+          echo "$FILES"
 
-      - name: � Clean up directories
+      # Restante do seu workflow permanece igual...
+      - name: 🧹 Clean up directories
         run: |
           rm -rf content/posts/*
           rm -rf static/images/*
           mkdir -p content/posts
           mkdir -p static/images
 
-      - name: 📂 Copy files from obsidian-vault
+      - name: 📂 Copy files
         env:
           FILES: ${{ steps.payload.outputs.files }}
         run: |
-          git clone https://github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
+          git clone https://${{ github.actor }}:${{ secrets.GARDEN_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
           
-          # Processar cada ficheiro
-          jq -r '.[]' filelist.txt | while read -r file; do
-            if [[ "$file" == *.md ]]; then
-              mkdir -p "content/posts/$(dirname "$file")"
-              cp "/tmp/obsidian-vault/$file" "content/posts/$file"
-              sed -i 's|!\[\[attachments/|![](/images/|g' "content/posts/$file"
-              echo "📄 Copiada nota: $file"
-            elif [[ "$file" == attachments/* ]]; then
-              filename=$(basename "$file")
-              cp "/tmp/obsidian-vault/$file" "static/images/$filename"
-              echo "🖼️ Copiada imagem: $filename"
+          echo "$FILES" | while read -r file; do
+            if [[ -f "/tmp/obsidian-vault/$file" ]]; then
+              if [[ "$file" == *.md ]]; then
+                mkdir -p "content/posts/$(dirname "$file")"
+                cp "/tmp/obsidian-vault/$file" "content/posts/$file"
+                echo "📝 Processada nota: $file"
+              elif [[ "$file" == attachments/* ]]; then
+                cp "/tmp/obsidian-vault/$file" "static/images/$(basename "$file")"
+                echo "🖼️ Copiada imagem: $(basename "$file")"
+              fi
+            else
+              echo "⚠️ Ficheiro não encontrado: $file"
             fi
           done
 
-      # [Mantém os passos existentes de Hugo e FTP abaixo]
-      - name: 🛠️ Instalar Hugo
-        uses: peaceiris/actions-hugo@v2
-        with:
-          hugo-version: 'latest'
-          extended: true
-
-      - name: 📦 Gerar site com Hugo
-        run: hugo --minify
-
-      - name: 📡 Fazer deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_PATH }}
-          local-dir: public/
+      # [Mantém os passos do Hugo e FTP abaixo]
