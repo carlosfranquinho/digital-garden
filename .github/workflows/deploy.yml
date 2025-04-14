@@ -4,68 +4,86 @@ on:
   repository_dispatch:
     types: [obsidian-update]
 
-permissions:  # Adicionando permissões explícitas
-  contents: write
-  actions: write  # Necessário para cancelar workflows
-  deployments: write
-
 jobs:
   process-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🛑 Cancel Previous Runs
-        if: github.event_name == 'repository_dispatch'  # Só cancela se for trigger manual
-        uses: styfle/cancel-workflow-action@0.11.0
-        with:
-          access_token: ${{ secrets.GITHUB_TOKEN }}  # Usa o token explicitamente
-
       - name: 🚀 Checkout repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: 📥 Process payload data
+      - name: 📥 Process payload
         id: payload
         run: |
-          # Verifica se o payload está no formato esperado
-          if [ -z '${{ github.event.client_payload.notas }}' ]; then
-            echo "::error::Payload inválido - campo 'notas' não encontrado"
-            exit 1
-          fi
-          
-          FILES=$(echo '${{ toJSON(github.event.client_payload.notas) }}' | jq -r '.[] | select(length > 0)')
-          echo "files=${FILES}" >> $GITHUB_OUTPUT
-          echo "ℹ️ Ficheiros a processar:"
-          echo "$FILES"
+          # Converter payload para JSON
+          echo '${{ toJSON(github.event.client_payload.notas) }}' > notas.json
+          echo "📋 Payload recebido:"
+          cat notas.json
 
-      # Restante do seu workflow permanece igual...
-      - name: 🧹 Clean up directories
+      - name: 🧹 Limpar diretórios
         run: |
           rm -rf content/posts/*
           rm -rf static/images/*
           mkdir -p content/posts
           mkdir -p static/images
 
-      - name: 📂 Copy files
+      - name: 📂 Processar arquivos
         env:
           FILES: ${{ steps.payload.outputs.files }}
         run: |
+          # Clonar repositório fonte
           git clone https://${{ github.actor }}:${{ secrets.GARDEN_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
-          
-          echo "$FILES" | while read -r file; do
-            if [[ -f "/tmp/obsidian-vault/$file" ]]; then
-              if [[ "$file" == *.md ]]; then
-                mkdir -p "content/posts/$(dirname "$file")"
-                cp "/tmp/obsidian-vault/$file" "content/posts/$file"
-                echo "📝 Processada nota: $file"
-              elif [[ "$file" == attachments/* ]]; then
-                cp "/tmp/obsidian-vault/$file" "static/images/$(basename "$file")"
-                echo "🖼️ Copiada imagem: $(basename "$file")"
-              fi
-            else
-              echo "⚠️ Ficheiro não encontrado: $file"
+
+          # Slugify function
+          slugify() {
+            echo "$1" | 
+            iconv -t ascii//TRANSLIT |
+            tr -d "'" |
+            tr -s '[:space:][:punct:]' '-' |
+            tr '[:upper:]' '[:lower:]' |
+            sed 's/-$//;s/^-//'
+          }
+
+          # Processar cada arquivo
+          jq -r '.[]' notas.json | while read -r original; do
+            if [[ "$original" == *.md ]]; then
+              # Slugificar nome do arquivo
+              filename=$(basename "$original" .md)
+              dirpath=$(dirname "$original")
+              slug=$(slugify "$filename")
+              new_path="content/posts/$(slugify "$dirpath")/${slug}.md"
+              
+              # Criar diretório e copiar arquivo
+              mkdir -p "$(dirname "$new_path")"
+              cp "/tmp/obsidian-vault/$original" "$new_path"
+              
+              # Atualizar links de imagens no markdown
+              sed -i -E "s|!\[\[attachments/([^]]+)\]\]|![](/images/\1)|g" "$new_path"
+              echo "📄 Processado: $original → $new_path"
+
+            elif [[ "$original" == attachments/* ]]; then
+              # Copiar imagens mantendo nome original (ou slugificar se preferir)
+              filename=$(basename "$original")
+              cp "/tmp/obsidian-vault/$original" "static/images/$filename"
+              echo "🖼️ Copiada imagem: $filename"
             fi
           done
 
       # [Mantém os passos do Hugo e FTP abaixo]
+      - name: 🛠️ Instalar Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: 'latest'
+          extended: true
+
+      - name: 📦 Gerar site com Hugo
+        run: hugo --minify
+
+      - name: 📡 Fazer deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_PATH }}
+          local-dir: public/
