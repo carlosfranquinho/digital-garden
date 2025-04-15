@@ -13,7 +13,7 @@ Na semana passada, a empresa Colossal Biosciences anunciou o nascimento de três
 
 Os filhotes — batizados Romulus, Remus e Khaleesi — resultam de um processo de edição genética aplicado a lobos-cinzentos modernos (*Canis lupus*), com o objetivo de replicar características morfológicas do lobo-terrível: tamanho maior, pelagem espessa e mandíbula mais robusta.
 
-![](/imagens/Pasted image 20250412000713.png)
+{{< taped src="/imagens/Pasted image 20250412000713.png" alt="Pasted image 20250412000713.png" >}}
 
 Mas importa esclarecer: **não estamos perante uma verdadeira desextinção**, nem sequer uma clonagem.
 
@@ -32,7 +32,7 @@ Neste caso, foram editados **14 genes em cerca de 20.000** — ou seja, **menos 
 
 O projeto é fascinante, mas talvez devêssemos ser mais cautelosos com os termos que usamos. A aparência pode enganar — e no caso da genética, engana mesmo.
 
-![](/imagens/Pasted image 20250412000738.png)
+{{< taped src="/imagens/Pasted image 20250412000738.png" alt="Pasted image 20250412000738.png" >}}
 ---
 
 > “Trazer de volta” uma espécie vai muito além de replicar-lhe o aspeto.
