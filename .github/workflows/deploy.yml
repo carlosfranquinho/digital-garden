@@ -35,7 +35,7 @@ jobs:
       - name: 📂 Importar Notas e Imagens
         run: |
           # Verificar se o vault existe
-          if ! git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault 2>/dev/null; then
+          if ! git clone https://${{ github.actor }}:${{ secrets.GARDEN_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault 2>/dev/null; then
             echo "::error::Repositório obsidian-vault não encontrado ou inacessível"
             exit 1
           fi
