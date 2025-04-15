@@ -6,7 +6,7 @@ pinned: true
 
 # Olá, eu sou o Carlos
 
-Este é o meu jardim digital — um lugar onde junto tudo o que me interessa e me desperta curiosidade.  
+Este é o meu [[digital garden|jardim digital]] — um lugar onde junto tudo o que me interessa e me desperta curiosidade.  
 Não é um blog, nem um portefólio, nem uma enciclopédia. É mais como um caderno com páginas que vou voltando a abrir, riscando, ligando, e deixando crescer ao seu ritmo.
 
 ---
