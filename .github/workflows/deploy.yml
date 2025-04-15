@@ -31,32 +31,37 @@ jobs:
           rm -rf static/imagens/*
           mkdir -p content/post static/imagens
 
-      # 4. Importar conteúdo do Obsidian (com tratamento de erro)
-      - name: 📂 Importar Notas e Imagens
+      - name: 📂 Importar Notas e Imagens (com correção de nomes)
         run: |
-          # Verificar se o vault existe
+          # Clonar repositório obsidian-vault
           if ! git clone https://${{ github.actor }}:${{ secrets.GARDEN_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault 2>/dev/null; then
             echo "::error::Repositório obsidian-vault não encontrado ou inacessível"
             exit 1
           fi
 
-          # Slugify function
+          # Função slugify simples
           slugify() {
-            echo "$1" | 
+            echo "$1" |
             iconv -t ascii//TRANSLIT |
             tr -d "'\"" |
-            tr -s '[:space:][:punct:]' '-' |
             tr '[:upper:]' '[:lower:]' |
-            sed 's/-$//;s/^-//;s/[^a-z0-9\-]//g'
+            tr -s '[:space:][:punct:]' '-' |
+            sed 's/^-//;s/-$//' |
+            sed 's/[^a-z0-9\-]//g'
           }
 
-          # Processar arquivos
+          # Processar entradas do JSON
           jq -r '.[]' /tmp/notas.json | while read -r original; do
             if [[ "$original" == *.md ]]; then
-              novo_nome="content/post/$(slugify "$original")"
-              mkdir -p "$(dirname "$novo_nome")"
+              nome_base="$(basename "$original")"
+              nome_sem_ext="${nome_base%.*}"
+              slug_nome="$(slugify "$nome_sem_ext").md"
+              novo_nome="content/post/$slug_nome"
               cp "/tmp/obsidian-vault/$original" "$novo_nome"
-              sed -i -E 's|!\[\[(attachments/)?([^]]+)\]\]|![](/imagens/\2)|g' "$novo_nome"
+
+              # Corrigir imagens no conteúdo para o shortcode Hugo
+              sed -i -E 's|!\[\[(attachments/)?([^]]+)\]\]|{{< taped src="/imagens/\2" alt="\2" >}}|g' "$novo_nome"
+
               echo "📄 $original → $novo_nome"
 
             elif [[ "$original" == attachments/* ]]; then
@@ -64,6 +69,7 @@ jobs:
               echo "🖼️ $(basename "$original")"
             fi
           done
+
 
       # 5. Build com Hugo
       - name: 🛠️ Instalar Hugo
