@@ -22,6 +22,16 @@ enableRSS = true
 enableGoogleAnalytics = false
 custom_css = ["css/custom.css"]
 
+[menu]
+  [[menu.main]]
+    name = "Notas"
+    url = "/notas/"
+    weight = 3
+
+[permalinks]
+notas = "/notas/:slug/"
+
+
 [markup]
   [markup.highlight]
     noClasses = false
