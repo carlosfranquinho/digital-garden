@@ -24,9 +24,9 @@ jobs:
 
       - name: 🧹 Limpar Diretórios
         run: |
-          rm -rf content/post/*
+          rm -rf content/notas/*
           rm -rf static/imagens/*
-          mkdir -p content/post static/imagens
+          mkdir -p content/notas static/imagens
 
       - name: 📂 Importar Notas e Imagens com conversão
         run: |
@@ -40,13 +40,25 @@ jobs:
           from PIL import Image
 
           VAULT = Path("/tmp/obsidian-vault")
-          DEST_NOTAS = Path("content/post")
+          DEST_NOTAS = Path("content/notas")
           DEST_IMGS = Path("static/imagens")
 
           with open("/tmp/notas.json", "r") as f:
               paths = json.load(f)
 
           img_count = {}
+
+          def format_link(link_text):
+              link_text = link_text.strip().strip('"').strip("'")
+              if '|' in link_text:
+                  target, alias = link_text.split('|', 1)
+              else:
+                  target = alias = link_text
+              slug = slugify(target)
+              return f"[{alias.strip()}](/notas/{slug})"
+
+          def corrigir_links(conteudo):
+              return re.sub(r'\[\[(.+?)\]\]', lambda m: format_link(m.group(1)), conteudo)
 
           for path in paths:
               origem = VAULT / path
@@ -81,6 +93,8 @@ jobs:
                       return f'{{{{< taped src="/imagens/{novo_nome}" alt="{slug}" >}}}}'
 
                   conteudo = re.sub(r'!\[\[(?:attachments/)?([^\]]+)\]\]', substituir, conteudo)
+                  conteudo = corrigir_links(conteudo)
+
                   destino = DEST_NOTAS / f"{slug}.md"
                   destino.write_text(conteudo, encoding="utf-8")
           EOF
@@ -110,6 +124,6 @@ jobs:
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add content/post static/imagens
+          git add content/notas static/imagens
           git diff --quiet && git diff --staged --quiet || git commit -m "Atualização automática: conteúdo do Obsidian [skip ci]"
           git push
