@@ -202,20 +202,4 @@ window.onscroll = function (e) {
     headerStuck.classList.remove('is-stuck');
   }
 };
-
-var style = localStorage.getItem('data-color-mode')
-githubIconElement = document.getElementById('github-icon')
-twitterIconElement = document.getElementById('twitter-icon')
-if (style == 'light') {
-  if (githubIconElement) githubIconElement.setAttribute('fill', '#24292e')
-  if (twitterIconElement) twitterIconElement.setAttribute('fill', 'black')
-}
-else {
-  if (githubIconElement) {
-    githubIconElement.removeAttribute('fill')
-    githubIconElement.setAttribute('class', 'octicon')
-    githubIconElement.setAttribute('color', '#f0f6fc')
-  }
-  if (twitterIconElement)  twitterIconElement.setAttribute('fill', 'white') 
-}
 </script>
