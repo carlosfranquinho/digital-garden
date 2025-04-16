@@ -36,7 +36,7 @@ notas = "/notas/:slug/"
   [markup.highlight]
     noClasses = false
     
-[markup.goldmark]
+  [markup.goldmark]
     [markup.goldmark.renderer]
       unsafe = true
       hardWraps = true
@@ -49,3 +49,6 @@ notas = "/notas/:slug/"
         enable = true
         linkResolution = "page"
         hrefStyle = "pretty"
+      [markup.tableOfContents]
+        startLevel = 2
+        endLevel = 3

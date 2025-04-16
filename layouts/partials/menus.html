@@ -8,7 +8,7 @@
       <div class="flex-shrink-0 col-12 col-md-3 mb-4 mb-md-0">
       </div>
       <div class="flex-shrink-0 col-12 col-md-9 mb-4 mb-md-0">
-        <div class="UnderlineNav width-full box-shadow-none hx_UnderlineNav-with-profile-color-modes-banner">
+        <div class="UnderlineNav width-full box-shadow-none hx_UnderlineNav-with-profile-color-modes-banner text-mono" style="font-size: 1.9rem;">
           <nav class="UnderlineNav-body">
             <a class="UnderlineNav-item {{ if .IsHome }} selected {{ end }}" href="{{ .Site.BaseURL }}">
               <svg class="octicon octicon-book UnderlineNav-octicon hide-sm" height="16" viewBox="0 0 16 16"
@@ -33,7 +33,7 @@
           </nav>
 
           <div class="profile-color-modes js-promo-color-modes-banner-profile isInitialToggle"
-            style="display: flex; align-items: center; margin-top: -6px;">
+            style="display: flex; align-items: center; padding-bottom: 10px;">
             <img id="theme-butterfly" src="/images/borboleta-dia.png" alt="Mudar tema" onclick="switchTheme()"
               style="cursor: pointer; width: 32px; height: 21px;" />
           </div>
