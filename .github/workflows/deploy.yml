@@ -9,69 +9,81 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout do repositório principal
       - name: 🚀 Checkout Digital Garden
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GARDEN_TOKEN }}
 
-      # 2. Processar payload
-      - name: 📥 Receber Conteúdo
+      - name: 📅 Receber Conteúdo
         id: payload
         run: |
           echo '${{ toJSON(github.event.client_payload.notas) }}' > /tmp/notas.json
-          echo "📋 Conteúdo recebido:"
+          echo "📌 Conteúdo recebido:"
           cat /tmp/notas.json
 
-      # 3. Limpar diretórios alvo (corrigido para content/post)
       - name: 🧹 Limpar Diretórios
         run: |
           rm -rf content/post/*
           rm -rf static/imagens/*
           mkdir -p content/post static/imagens
 
-      - name: 📂 Importar Notas e Imagens (com correção de nomes)
+      - name: 📂 Importar Notas e Imagens com conversão
         run: |
-          # Clonar repositório obsidian-vault
-          if ! git clone https://${{ github.actor }}:${{ secrets.GARDEN_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault 2>/dev/null; then
-            echo "::error::Repositório obsidian-vault não encontrado ou inacessível"
-            exit 1
-          fi
+          sudo apt update && sudo apt install -y python3-pip
+          pip install pillow python-slugify
 
-          # Função slugify simples
-          slugify() {
-            echo "$1" |
-            iconv -t ascii//TRANSLIT |
-            tr -d "'\"" |
-            tr '[:upper:]' '[:lower:]' |
-            tr -s '[:space:][:punct:]' '-' |
-            sed 's/^-//;s/-$//' |
-            sed 's/[^a-z0-9\-]//g'
-          }
+          cat << 'EOF' > processar.py
+          import os, json, re
+          from pathlib import Path
+          from slugify import slugify
+          from PIL import Image
 
-          # Processar entradas do JSON
-          jq -r '.[]' /tmp/notas.json | while read -r original; do
-            if [[ "$original" == *.md ]]; then
-              nome_base="$(basename "$original")"
-              nome_sem_ext="${nome_base%.*}"
-              slug_nome="$(slugify "$nome_sem_ext").md"
-              novo_nome="content/post/$slug_nome"
-              cp "/tmp/obsidian-vault/$original" "$novo_nome"
+          VAULT = Path("/tmp/obsidian-vault")
+          DEST_NOTAS = Path("content/post")
+          DEST_IMGS = Path("static/imagens")
 
-              # Corrigir imagens no conteúdo para o shortcode Hugo
-              sed -i -E 's|!\[\[(attachments/)?([^]]+)\]\]|{{< taped src="/imagens/\2" alt="\2" >}}|g' "$novo_nome"
+          with open("/tmp/notas.json", "r") as f:
+              paths = json.load(f)
 
-              echo "📄 $original → $novo_nome"
+          img_map = {}  # {nota_slug: contador}
 
-            elif [[ "$original" == attachments/* ]]; then
-              cp "/tmp/obsidian-vault/$original" "static/imagens/$(basename "$original")"
-              echo "🖼️ $(basename "$original")"
-            fi
-          done
+          for path in paths:
+              origem = VAULT / path
+              if path.endswith(".md"):
+                  nome_base = Path(path).stem
+                  slug = slugify(nome_base)
+                  contador = 1
+                  conteudo = origem.read_text(encoding="utf-8")
 
+                  def substituir(match):
+                      nonlocal contador
+                      nome_img = match.group(2)
+                      ext = Path(nome_img).suffix.lower()
+                      origem_img = VAULT / "attachments" / nome_img
+                      if not origem_img.exists():
+                          return ""  # ignora
+                      novo_nome = f"{slug}-{contador}.webp"
+                      destino_img = DEST_IMGS / novo_nome
 
-      # 5. Build com Hugo
+                      with Image.open(origem_img) as img:
+                          if img.width > 1200:
+                              ratio = 1200 / img.width
+                              img = img.resize((1200, int(img.height * ratio)))
+                          img.save(destino_img, "webp", quality=85)
+
+                      contador += 1
+                      return f"{{{{< taped src=\"/imagens/{novo_nome}\" alt=\"{slug}\" >}}}}"
+
+                  conteudo = re.sub(r'!\[\[(?:attachments/)?([^\]]+)\]\]', substituir, conteudo)
+                  destino = DEST_NOTAS / f"{slug}.md"
+                  destino.write_text(conteudo, encoding="utf-8")
+
+          EOF
+
+          git clone https://${{ github.actor }}:${{ secrets.GARDEN_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
+          python3 processar.py
+
       - name: 🛠️ Instalar Hugo
         uses: peaceiris/actions-hugo@v2
         with:
@@ -81,7 +93,6 @@ jobs:
       - name: 📦 Gerar Site
         run: hugo --minify
 
-      # 6. Deploy FTP
       - name: 📡 FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
@@ -91,7 +102,6 @@ jobs:
           server-dir: ${{ secrets.FTP_PATH }}
           local-dir: public/
 
-      # 7. Atualizar repositório
       - name: 🔄 Commitar Mudanças
         run: |
           git config --global user.name "GitHub Actions"

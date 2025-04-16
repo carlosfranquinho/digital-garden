@@ -62,17 +62,20 @@ body, .markdown-body, .f5 {
 
 .taped-image {
   position: relative;
-  display: inline-block;        /* mantém imagem compacta */
+  display: inline-block;
   margin: 2em auto;
   max-width: 100%;
-  text-align: center;           /* alinha imagem dentro, se necessário */
+  text-align: center;
+  transform: rotate(var(--rotacao-img, -0.4deg));
 }
 
-
+article .taped-image {
+  display: table;
+  margin: 2em auto;
+}
 
 .taped-shadow {
   display: inline-block;
-  transform: rotate(-0.4deg);
   filter: drop-shadow(3px 4px 8px rgba(0, 0, 0, 0.12));
 }
 
@@ -85,35 +88,56 @@ body, .markdown-body, .f5 {
   max-width: 100%;
   height: auto;
   clip-path: polygon(
-    3% 0%, 97% 1%, 100% 5%, 99% 95%, 96% 100%, 4% 99%, 0% 95%, 1% 5%
+    var(--p1x, 3%) var(--p1y, 0%),
+    var(--p2x, 97%) var(--p2y, 1%),
+    var(--p3x, 100%) var(--p3y, 5%),
+    var(--p4x, 99%) var(--p4y, 95%),
+    var(--p5x, 96%) var(--p5y, 100%),
+    var(--p6x, 4%) var(--p6y, 99%),
+    var(--p7x, 0%) var(--p7y, 95%),
+    var(--p8x, 1%) var(--p8y, 5%)
   );
   border-radius: 2px;
   filter: contrast(1.05) brightness(0.97);
 }
 
+/* fitas (ambas) */
 .taped-image::before,
 .taped-image::after {
   content: '';
   position: absolute;
-  width: 80px;
+  width: 90px;
   height: 28px;
-  background: rgba(240, 220, 150, 0.85); /* tom de fita crepe */
-  top: -14px;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(240, 220, 150, 0.85),
+    rgba(240, 220, 150, 0.85) 10px,
+    rgba(235, 210, 140, 0.8) 10px,
+    rgba(235, 210, 140, 0.8) 20px
+  );
+  opacity: 0.9;
   z-index: 2;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
 }
 
+/* fita superior */
 .taped-image::before {
-  left: 12%;
-  transform: rotate(-6deg);
+  top: -14px;
+  left: var(--pos-topo, 12%);
+  transform: rotate(var(--rotacao-topo, -5deg));
 }
 
+/* fita inferior */
 .taped-image::after {
-  right: 12%;
-  transform: rotate(6deg);
+  bottom: -14px;
+  right: var(--pos-fundo, 14%);
+  transform: rotate(var(--rotacao-fundo, 5deg));
 }
 
-article .taped-image {
-  display: table;
-  margin: 2em auto;
+
+.user-profile-mini-vcard strong {
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
