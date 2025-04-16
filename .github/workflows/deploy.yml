@@ -46,24 +46,25 @@ jobs:
           with open("/tmp/notas.json", "r") as f:
               paths = json.load(f)
 
-          img_map = {}  # {nota_slug: contador}
+          img_count = {}
 
           for path in paths:
               origem = VAULT / path
               if path.endswith(".md"):
                   nome_base = Path(path).stem
                   slug = slugify(nome_base)
-                  contador = 1
+                  img_count[slug] = 1
+
                   conteudo = origem.read_text(encoding="utf-8")
 
                   def substituir(match):
-                      nonlocal contador
-                      nome_img = match.group(2)
-                      ext = Path(nome_img).suffix.lower()
+                      nome_img = match.group(1)
                       origem_img = VAULT / "attachments" / nome_img
                       if not origem_img.exists():
-                          return ""  # ignora
-                      novo_nome = f"{slug}-{contador}.webp"
+                          return ""
+
+                      n = img_count[slug]
+                      novo_nome = f"{slug}-{n}.webp"
                       destino_img = DEST_IMGS / novo_nome
 
                       with Image.open(origem_img) as img:
@@ -72,13 +73,12 @@ jobs:
                               img = img.resize((1200, int(img.height * ratio)))
                           img.save(destino_img, "webp", quality=85)
 
-                      contador += 1
-                      return f"{{{{< taped src=\"/imagens/{novo_nome}\" alt=\"{slug}\" >}}}}"
+                      img_count[slug] += 1
+                      return f'{{{{< taped src="/imagens/{novo_nome}" alt="{slug}" >}}}}'
 
                   conteudo = re.sub(r'!\[\[(?:attachments/)?([^\]]+)\]\]', substituir, conteudo)
                   destino = DEST_NOTAS / f"{slug}.md"
                   destino.write_text(conteudo, encoding="utf-8")
-
           EOF
 
           git clone https://${{ github.actor }}:${{ secrets.GARDEN_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
