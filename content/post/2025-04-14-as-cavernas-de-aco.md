@@ -35,7 +35,7 @@ date: 2025-04-14
 
 **Publicado originalmente em 1954 e traduzido em Portugal na mítica coleção Argonauta (nº 37), _As Cavernas de Aço_ é uma curiosa fusão entre o policial clássico e a ficção científica visionária.** Com esta obra, Isaac Asimov inaugura um dos seus universos mais fascinantes: o dos robôs e da sua complexa relação com a humanidade.
 
-{{< taped src="/imagens/Pasted image 20250414160649.jpg" alt="Pasted image 20250414160649.jpg" >}}
+{{< taped src="/imagens/2025-04-14-as-cavernas-de-aco-1.webp" alt="2025-04-14-as-cavernas-de-aco" >}}
 ## Uma distopia claustrofóbica e atual
 
 _As Cavernas de Aço_ transporta-nos para uma Nova Iorque futurista e superpovoada, onde os seres humanos vivem enclausurados em megacidades subterrâneas – verdadeiras "cavernas" de betão e metal, de onde raramente saem. O contacto com o exterior é temido, e a vida tornou-se rigidamente organizada, quase maquinal. Nesta sociedade sufocante, a presença de robôs — criados para servir, mas odiados pela maioria — é uma fonte constante de tensão. 
