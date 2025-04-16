@@ -34,7 +34,7 @@ jobs:
           pip install pillow python-slugify
 
           cat << 'EOF' > processar.py
-          import os, json, re
+          import os, json, re, shutil
           from pathlib import Path
           from slugify import slugify
           from PIL import Image
@@ -67,11 +67,15 @@ jobs:
                       novo_nome = f"{slug}-{n}.webp"
                       destino_img = DEST_IMGS / novo_nome
 
-                      with Image.open(origem_img) as img:
-                          if img.width > 1200:
-                              ratio = 1200 / img.width
-                              img = img.resize((1200, int(img.height * ratio)))
-                          img.save(destino_img, "webp", quality=85)
+                      ext = origem_img.suffix.lower()
+                      if ext == ".webp":
+                          shutil.copy2(origem_img, destino_img)
+                      else:
+                          with Image.open(origem_img) as img:
+                              if img.width > 1200:
+                                  ratio = 1200 / img.width
+                                  img = img.resize((1200, int(img.height * ratio)))
+                              img.save(destino_img, "webp", quality=85)
 
                       img_count[slug] += 1
                       return f'{{{{< taped src="/imagens/{novo_nome}" alt="{slug}" >}}}}'
