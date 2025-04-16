@@ -34,12 +34,4 @@ Escrevo, volto atrás, ligo ideias, deixo em pausa, volto a mexer.
 
 ---
 
-## Fala comigo
-
-Se alguma nota te fizer pensar, ou quiseres trocar ideias, podes encontrar-me aqui:
-
-- [GitHub](https://github.com/carlosfranquinho)
-
----
-
 > 🌾 Este jardim cresce devagar, mas com raízes profundas.

@@ -1,0 +1,32 @@
+diff --git a/themes/github-style/static/css/custom.css b/themes/github-style/static/css/custom.css
+index 3db2f55..ff5c67f 100644
+--- a/themes/github-style/static/css/custom.css
++++ b/themes/github-style/static/css/custom.css
+@@ -60,14 +60,16 @@ body, .markdown-body, .f5 {
+   margin-bottom: 0.5em;
+ }
+ 
+-
+ .taped-image {
+   position: relative;
+-  display: inline-block;
++  display: inline-block;        /* mantém imagem compacta */
+   margin: 2em auto;
+   max-width: 100%;
++  text-align: center;           /* alinha imagem dentro, se necessário */
+ }
+ 
++
++
+ .taped-shadow {
+   display: inline-block;
+   transform: rotate(-0.4deg);
+@@ -110,3 +112,8 @@ body, .markdown-body, .f5 {
+   right: 12%;
+   transform: rotate(6deg);
+ }
++
++article .taped-image {
++  display: table;
++  margin: 2em auto;
++}

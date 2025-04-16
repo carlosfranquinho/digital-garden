@@ -9,6 +9,7 @@ ano_original: "1954"
 ano_edicao: "1956"
 formato: capa mole
 data_leitura: 2025-04-13
+date: 2025-04-13T00:09:19
 avaliacao: 9/10
 publish: true
 tags:

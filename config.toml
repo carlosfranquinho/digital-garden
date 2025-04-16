@@ -22,20 +22,6 @@ enableRSS = true
 enableGoogleAnalytics = false
 custom_css = ["css/custom.css"]
 
-[menu]
-  [[menu.main]]
-    name = "Início"
-    url = "/"
-    weight = 1
-  [[menu.main]]
-    name = "Sobre"
-    url = "/about/"
-    weight = 2
-  [[menu.main]]
-    name = "Arquivo"
-    url = "/post/"
-    weight = 3
-
 [markup]
   [markup.highlight]
     noClasses = false
