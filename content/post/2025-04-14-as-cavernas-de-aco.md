@@ -17,6 +17,7 @@ tags:
   - scifi
   - robots
   - ia
+date: 2025-04-14
 ---
 # As cavernas de aço, de Isaac Asimov – Review
 
