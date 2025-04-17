@@ -15,7 +15,7 @@ Um **digital garden** é uma forma de organizar e partilhar conhecimento pessoal
 {{< taped src="digital-garden-1.webp" alt="digital-garden" >}}
 ## Para que servem?
 - Para **organizar ideias**.
-- **Pensar em público** e partilhar o processo de aprendizagem.
+- **Pensar em público** e partilhar o processo de aprendizagem. 
 - **Criar conexões entre notas** (um cérebro digital, ou "second brain").
 - Servir como **repositório** de conhecimento, sempre em atualização
 - Incentivar a escrita e **reflexão contínua**, sem a pressão de perfeição.
