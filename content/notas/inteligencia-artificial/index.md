@@ -20,7 +20,7 @@ A **IA Fraca** refere-se a sistemas criados para realizar tarefas **muito espec�
 - Um LLM (Large Language Model), como o ChatGPT que consegue responder a perguntas e manter uma conversa natural.
 
 Embora os ChatBots inteligentes consigam simular um diálogo inteligente, não "sabem" que estão a falar conosco da mesma forma que sabemos que estamos a falar com eles. As respostas que dão são fruto de modelos matemáticos treinados com grandes volumes de dados. São **simulações convincentes**, não são conscientes nem têm emoções.
-{{< taped src="/imagens/inteligencia-artificial-1.webp" alt="inteligencia-artificial" >}}
+{{< taped src="inteligencia-artificial-1.webp" alt="inteligencia-artificial" >}}
 ## IA Forte (Strong AI): a inteligência geral. AGI, Artificial General Intelligence
 A **IA Forte**, por outro lado, seria uma inteligência **verdadeiramente consciente**, capaz de compreender, aprender e aplicar conhecimento de forma geral, **como um ser humano** (ou superior). Uma IA forte conseguiria:
 - Compreender linguagem natural em profundidade.
@@ -29,7 +29,7 @@ A **IA Forte**, por outro lado, seria uma inteligência **verdadeiramente consci
 - Ter autoconsciência e intenção.
 
 Apesar de ser um tema recorrente em ficção científica - como o _HAL 9000_ de _2001: Odisseia no Espaço_, ou os androides de _Westworld_, **a IA forte ainda não existe**. Atualmente, estamos longe de criar uma IA com capacidades cognitivas e emocionais equiparadas às humanas.
-{{< taped src="/imagens/inteligencia-artificial-2.webp" alt="inteligencia-artificial" >}}
+{{< taped src="inteligencia-artificial-2.webp" alt="inteligencia-artificial" >}}
 # Aprendizagem de Máquina e Aprendizagem Profunda
 Subcampos da IA que permitem às máquinas aprender com dados sem serem explicitamente programadas. Inspiram-se na forma como os humanos aprendem com exemplos. A aprendizagem profunda (_deep learning_) usa redes neuronais artificiais para identificar padrões complexos, como imagens ou vozes, em várias camadas sucessivas de análise.
 
@@ -74,7 +74,7 @@ Mesmo sem consciência, a IA fraca já tem um impacto gigantesco na sociedade, e
 - Traduções automáticas e filtros de imagem
 
 Estes sistemas baseiam-se em **aprendizagem de máquina (_machine learning_)** e, em casos mais sofisticados, em **aprendizagem profunda (_deep learning_)** - modelos que, à semelhança do cérebro humano, aprendem a partir de dados e experiências passadas.
-{{< taped src="/imagens/inteligencia-artificial-3.webp" alt="inteligencia-artificial" >}}
+{{< taped src="inteligencia-artificial-3.webp" alt="inteligencia-artificial" >}}
 Mesmo que não o percebas, utilizas a IA frequentemente!
 
 # Aplicações Empresariais
@@ -112,7 +112,7 @@ Com o crescimento do Big Data e da computação em nuvem, a IA terá um papel ce
 - Cultura de dados nas empresas
 
 Mesmo uma IA Fraca pode causar danos se não for usada com responsabilidade - é por isso que precisamos de equipas diversificadas e conscientes no desenvolvimento destas tecnologias. Como qualquer ferramenta, pode ser usada para o bem e para o mal - tudo depende das intenções de quem a usa...
-{{< taped src="/imagens/inteligencia-artificial-4.webp" alt="inteligencia-artificial" >}}
+{{< taped src="inteligencia-artificial-4.webp" alt="inteligencia-artificial" >}}
 ## E se um dia criarmos uma IA Forte?
 A criação de uma **IA Forte** envolveria desafios colossais, tanto técnicos como éticos. Teríamos de garantir que:
 - Os seus valores e objetivos fossem compatíveis com os nossos.
