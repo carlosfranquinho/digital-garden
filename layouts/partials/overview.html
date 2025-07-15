@@ -25,43 +25,6 @@
     </div>
     {{ end }}
 
-    {{ $section := where .Site.RegularPages "Section" "in" (slice "post") }}
-    <div class="mt-4 position-relative" id="contributions" data='[{{ range $index, $elem := $section }}
-{
-  "title": "{{ .Title }}",
-  "link": "{{ .Permalink }}",
-  "publishDate": "{{ .PublishDate.Format "2006-01-02 15:04:05" }}"
-}{{ if ne $index (sub (len $section) 1) }},{{ end }}
-{{ end }}]'>
-      <div class="js-yearly-contributions">
-        <div class="position-relative">
-          <h2 class="f4 text-normal mb-2" id="posts-count"></h2>
-          <div class="border py-2 graph-before-activity-overview">
-            <div
-              class="js-calendar-graph mx-md-2 mx-3 d-flex flex-column flex-items-end flex-xl-items-center overflow-hidden pt-1 is-graph-loading graph-canvas calendar-graph height-full text-center">
-              <svg width="828" height="128" class="js-calendar-graph-svg">
-                <g transform="translate(10, 20)" id="graph-svg">
-                </g>
-              </svg>
-            </div>
-            <div class="contrib-footer clearfix mt-1 mx-3 px-3 pb-1">
-              <div class="float-left text-gray">
-              </div>
-              <div class="contrib-legend text-gray">
-                Menos
-                <ul class="legend">
-                  <li style="background-color: var(--color-calendar-graph-day-bg)"></li>
-                  <li style="background-color: var(--color-calendar-graph-day-L1-bg)"></li>
-                  <li style="background-color: var(--color-calendar-graph-day-L2-bg)"></li>
-                  <li style="background-color: var(--color-calendar-graph-day-L3-bg)"></li>
-                  <li style="background-color: var(--color-calendar-graph-day-L4-bg)"></li>
-                </ul>
-                Mais
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <div class="activity-listing contribution-activity">
         <div class="d-none d-lg-block">
