@@ -1,7 +1,5 @@
 {{ $section := where .Site.RegularPages "Section" "in" (slice "notas") }}
 {{ $section_count := len $section }}
-
-<div class="mt-4 position-sticky top-0 d-none d-md-block bg-white width-full border-bottom color-border-secondary"
   style="z-index:3;">
   <div class="container-xl px-3 px-md-4 px-lg-5">
     <div class="gutter-condensed gutter-lg flex-column flex-md-row d-flex">
@@ -31,14 +29,6 @@
               <span class="Counter">{{ $section_count}}</span>
             </a>
           </nav>
-
-          <div class="profile-color-modes js-promo-color-modes-banner-profile isInitialToggle"
-            style="display: flex; align-items: center; padding-bottom: 10px;">
-            <img id="theme-butterfly" src="/images/borboleta-dia.png" alt="Mudar tema" onclick="switchTheme()"
-              style="cursor: pointer; width: 32px; height: 21px;" />
-          </div>
-
-
         </div>
       </div>
     </div>
