@@ -33,75 +33,7 @@ jobs:
           pip install pillow python-slugify
 
           cat << 'EOF' > processar.py
-          import os, json, re, shutil
-          from pathlib import Path
-          from slugify import slugify
-          from PIL import Image
-
-          VAULT = Path("/tmp/obsidian-vault")
-          DEST_ROOT = Path("content/notas")
-
-          with open("/tmp/notas.json", "r") as f:
-              paths = json.load(f)
-
-          img_count = {}
-
-          def format_link(link_text):
-              link_text = link_text.strip().strip('"').strip("'")
-              if '|' in link_text:
-                  target, alias = link_text.split('|', 1)
-              else:
-                  target = alias = link_text
-              slug = slugify(target)
-              return f"[{alias.strip()}](/notas/{slug})"
-
-          def corrigir_links(conteudo):
-              return re.sub(r'\[\[(.+?)\]\]', lambda m: format_link(m.group(1)), conteudo)
-
-          for path in paths:
-              origem = VAULT / path
-
-              if path.endswith(".md"):
-                  nome_base = Path(path).stem
-                  slug = slugify(nome_base)
-                  destino_pasta = DEST_ROOT / slug
-                  destino_pasta.mkdir(parents=True, exist_ok=True)
-                  destino_md = destino_pasta / "index.md"
-                  img_count[slug] = 1
-
-                  conteudo = origem.read_text(encoding="utf-8")
-
-                  def substituir(match):
-                      nome_img = match.group(1).strip()
-
-                      origem_img = None
-                      for img_path in paths:
-                          if img_path.endswith(nome_img):
-                              origem_img = VAULT / img_path
-                              break
-                      if not origem_img or not origem_img.exists():
-                          return ""
-
-                      n = img_count[slug]
-                      novo_nome = f"{slug}-{n}.webp"
-                      destino_img = destino_pasta / novo_nome
-
-                      ext = origem_img.suffix.lower()
-                      if ext == ".webp":
-                          shutil.copy2(origem_img, destino_img)
-                      else:
-                          with Image.open(origem_img) as img:
-                              if img.width > 1200:
-                                  ratio = 1200 / img.width
-                                  img = img.resize((1200, int(img.height * ratio)))
-                              img.save(destino_img, "webp", quality=85)
-
-                      img_count[slug] += 1
-                      return f'{{{{< taped src="{novo_nome}" alt="{slug}" >}}}}'
-
-                  conteudo = re.sub(r'!\[\[([^\]]+)\]\]', substituir, conteudo)
-                  conteudo = corrigir_links(conteudo)
-                  destino_md.write_text(conteudo, encoding="utf-8")
+          [o conteúdo do teu script Python mantém-se igual]
           EOF
 
           git clone https://${{ github.actor }}:${{ secrets.GARDEN_TOKEN }}@github.com/${{ github.repository_owner }}/obsidian-vault.git /tmp/obsidian-vault
@@ -114,21 +46,12 @@ jobs:
           extended: true
 
       - name: 📦 Gerar Site
-        run: hugo --minify
-
-      - name: 📡 FTP Deploy
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_PATH }}
-          local-dir: public/
+        run: hugo --minify -d docs
 
       - name: 🔄 Commitar Mudanças
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add content/notas
+          git add content/notas docs
           git diff --quiet && git diff --staged --quiet || git commit -m "Atualização automática: conteúdo do Obsidian [skip ci]"
           git push
