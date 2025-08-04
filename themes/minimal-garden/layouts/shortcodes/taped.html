@@ -1,0 +1,22 @@
+{{/* taped.html */}}
+
+{{/* Gerar valores aleatórios com base na hora atual (não muda em cada imagem mas muda a cada refresh do site) */}}
+{{ $seed := now.UnixNano }}
+{{ $rot := mod $seed 7 | sub 3 | float }}                {{/* entre -3 e +3 graus */}}
+{{ $top := mod (add $seed 11) 40 | add 10 }}             {{/* 10% a 50% */}}
+{{ $bottom := mod (add $seed 23) 40 | add 10 }}          {{/* idem */}}
+{{ $rotTop := mod (add $seed 37) 10 | sub 5 | float }}   {{/* -5 a +5 graus */}}
+{{ $rotBottom := mod (add $seed 51) 10 | sub 5 | float }}
+
+<figure class="taped-image"
+  style="
+    --rotacao-img: {{ $rot }}deg;
+    --pos-topo: {{ $top }}%;
+    --pos-fundo: {{ $bottom }}%;
+    --rotacao-topo: {{ $rotTop }}deg;
+    --rotacao-fundo: {{ $rotBottom }}deg;
+  ">
+  <div class="taped-shadow">
+    <img src="{{ .Get "src" }}" alt="{{ .Get "alt" | default "" }}" loading="lazy">
+  </div>
+</figure>

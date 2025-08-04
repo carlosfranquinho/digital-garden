@@ -1,0 +1,358 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Literata:ital,wght@0,400;0,700&display=swap');
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'DM Serif Display', serif;
+  font-weight: normal;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+body {
+  margin: 0;
+  font-family: 'Literata';  
+  font-size: 1.4rem; 
+  background: #fdfdfd;
+  color: #222;
+    line-height: 1.6;
+}
+
+.layout {
+  display: flex;
+  gap: 2rem;
+}
+
+.sidebar {
+  width: 240px;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+  position: sticky;
+  top: 2rem;
+  align-self: flex-start;
+  height: fit-content;
+}
+
+
+.sidebar h1 {
+  font-size: 1.6rem;
+  text-align: left;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+.sidebar p {
+  text-align: left;
+  font-size: 1rem;
+  margin: 0.5rem 0 1.5rem 0;
+  color: #444;
+}
+
+.sidebar-info {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+  font-size: 0.9rem; /* um valor abaixo */
+}
+
+.sidebar-info li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.4rem 0;
+  text-align: left;
+
+  /* truncar se não couber */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-info a {
+  color: inherit;
+  text-decoration: none;
+  font-size: 0.9rem; /* igual ao li */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  max-width: 160px; /* ajusta se quiseres mais espaço */
+}
+
+
+.sidebar h2 {
+  font-size: 1.2rem;
+  text-align: left;
+  margin-bottom: 0.5rem;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: left;
+  gap: 0.7rem;
+}
+
+.social-icons img {
+  width: 24px;
+  height: 24px;
+  filter: grayscale(100%);
+  transition: filter 0.2s;
+}
+
+.social-icons img:hover {
+  filter: none;
+}
+
+
+.avatar {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto;
+  border: 1px solid #ccc; /* antes estava 4px */
+  box-shadow: none; /* remove sombra, já que queremos algo mais subtil */
+}
+
+
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  margin-top: 2.5rem;
+  position: relative;
+  z-index: 1;
+  display: flex;
+}
+
+
+main {
+  background: url("/images/papel-envelhecido-textura.png") repeat;
+  background-position: center top;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 2rem;
+  margin-top: 1rem;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1); /* opcional: profundidade subtil */
+}
+
+.main-block {
+  position: relative;
+  width: 100%;
+}
+
+
+main img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.5rem auto;
+  border-radius: 8px; 
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+
+main h1 {
+  font-size: 1.5rem;
+}
+
+main h2 {
+  font-size: 1.3rem;
+}
+
+main h3 {
+  font-size: 1.1rem;
+}
+
+
+.post-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 2rem;
+}
+
+.post-list li {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.post-list li:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+}
+
+
+.post-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.5rem; /* mais destacado */
+  color: #222;
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 0.3rem;
+}
+
+.post-title:hover {
+  color: #007acc;
+  text-decoration: underline;
+}
+
+
+.post-list time {
+  display: block;
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  margin-top: 0.2rem;
+}
+
+.post-list p {
+  margin-top: 0.8rem;
+  font-size: 1rem;
+  color: #333;
+}
+
+.post-meta {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.post-content {
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.post-content img {
+  max-width: 100%;
+  border-radius: 6px;
+  margin: 1rem 0;
+}
+
+.post-content blockquote {
+  border-left: 4px solid #ccc;
+  padding-left: 1rem;
+  color: #555;
+  font-style: italic;
+}
+
+.taped-image {
+  position: relative;
+  display: inline-block;
+  margin: 2em auto;
+  width: fit-content;
+  max-width: 100%; 
+  box-sizing: content-box;  text-align: center;
+  transform: rotate(var(--rotacao-img, -0.4deg));
+}
+
+
+
+article .taped-image {
+  display: table;
+  margin: 2em auto;
+}
+
+.taped-shadow {
+  display: inline-block;
+  filter: drop-shadow(3px 4px 8px rgba(0, 0, 0, 0.12));
+}
+
+.taped-shadow img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  clip-path: polygon(
+    var(--p1x, 3%) var(--p1y, 0%),
+    var(--p2x, 97%) var(--p2y, 1%),
+    var(--p3x, 100%) var(--p3y, 5%),
+    var(--p4x, 99%) var(--p4y, 95%),
+    var(--p5x, 96%) var(--p5y, 100%),
+    var(--p6x, 4%) var(--p6y, 99%),
+    var(--p7x, 0%) var(--p7y, 95%),
+    var(--p8x, 1%) var(--p8y, 5%)
+  );
+  border-radius: 2px;
+  filter: contrast(1.05) brightness(0.97);
+}
+
+/* fitas (ambas) */
+.taped-image::before,
+.taped-image::after {
+  content: '';
+  position: absolute;
+  width: 90px;
+  height: 28px;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(240, 220, 150, 0.85),
+    rgba(240, 220, 150, 0.85) 10px,
+    rgba(235, 210, 140, 0.8) 10px,
+    rgba(235, 210, 140, 0.8) 20px
+  );
+  opacity: 0.9;
+  z-index: 2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.taped-image::before {
+  top: -14px;
+  left: var(--pos-topo, 12%);
+  transform: rotate(var(--rotacao-topo, -5deg));
+}
+
+.taped-image::after {
+  bottom: -14px;
+  right: var(--pos-fundo, 14%);
+  transform: rotate(var(--rotacao-fundo, 5deg));
+}
+
+.bookmark-menu {
+  position: absolute;
+  top: -1.2rem; /* colado ao topo da folha */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 3;
+}
+
+.bookmark {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border-radius: 0.5rem 0.5rem 0 0;
+  background: #ddd;
+  text-decoration: none;
+  color: black;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  top: 0;
+  transition: top 0.1s ease;
+  z-index: 3;
+}
+
+.bookmark:hover {
+  top: 10px;
+}
+
+.bookmark.entrada {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.bookmark.notas {
+  background-color: #f7931e;
+  color: white;
+}
+
+.bookmark.active {
+  top: -0.3rem; /* levanta o separador ativo */
+  z-index: 3;
+}

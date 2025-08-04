@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ if .Title }}{{ .Title }} | {{ end }}{{ .Site.Title }}</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <div class="main-block">
+<div class="bookmark-menu">
+  <a href="{{ "/" | relURL }}" class="bookmark entrada {{ if .IsHome }}active{{ end }}">Entrada</a>
+<a href="{{ "/notas/" | relURL }}" class="bookmark notas {{ if in .Permalink "/notas/" }}active{{ end }}">Notas</a>
+</div>
+
+      <div class="container">
+        <div class="layout">
+          <aside class="sidebar">
+            <img src="{{ .Site.Params.avatar }}" alt="Avatar" class="avatar" />
+
+            <h1>{{ .Site.Params.author }}</h1>
+            <p>{{ .Site.Params.description }}</p>
+
+            <ul class="sidebar-info">
+              <li>
+                <img
+                  src="/images/location.svg"
+                  alt="Localização"
+                  class="icon"
+                />
+                {{ .Site.Params.location }}
+              </li>
+              <li>
+                <img src="/images/email.svg" alt="Email" class="icon" />
+                <a href="mailto:{{ .Site.Params.email }}"
+                  >{{ .Site.Params.email }}</a
+                >
+              </li>
+              <li>
+                <img src="/images/link.svg" alt="Site pessoal" class="icon" />
+                <a href="{{ .Site.Params.url }}" target="_blank"
+                  >{{ .Site.Params.url }}</a
+                >
+              </li>
+            </ul>
+
+            <h2>Onde me encontrar</h2>
+            <div class="social-icons">
+              {{ with .Site.Params.github }}
+              <a href="https://github.com/{{ . }}" target="_blank"
+                ><img src="/images/github-mark.png" alt="GitHub"
+              /></a>
+              {{ end }} {{ with .Site.Params.facebook }}
+              <a href="https://facebook.com/{{ . }}" target="_blank"
+                ><img src="/images/facebook.png" alt="Facebook"
+              /></a>
+              {{ end }} {{ with .Site.Params.instagram }}
+              <a href="https://instagram.com/{{ . }}" target="_blank"
+                ><img src="/images/instagram.png" alt="Instagram"
+              /></a>
+              {{ end }}
+            </div>
+          </aside>
+
+          <main>{{ block "main" . }}{{ end }}</main>
+        </div>
+      </div>
+
+      {{ partial "footer.html" . }}
+    </div>
+  </body>
+</html>

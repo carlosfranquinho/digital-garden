@@ -1,7 +1,7 @@
 baseURL = "https://carlos.franquinho.info/"  # Altera para o teu domínio real
 languageCode = "pt-pt"
 title = "Digital Garden do Carlos"
-theme = "github-style"
+theme = "minimal-garden"
 pygmentsCodeFences = true
 pygmentsUseClasses = true
 
