@@ -148,6 +148,7 @@ article .taped-image {
     position: fixed;
     top: 0;
     width: 260px;
+
     height: 100vh;
     overflow-y: auto;
     z-index: 5;
@@ -160,5 +161,5 @@ article .taped-image {
 
   #sidebar + .flex-shrink-0 {
     margin-left: 280px;
+
   }
-}
