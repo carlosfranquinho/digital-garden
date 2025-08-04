@@ -145,9 +145,20 @@ article .taped-image {
 
 @media (min-width: 768px) {
   #sidebar {
-    position: sticky;
+    position: fixed;
     top: 0;
+    width: 260px;
     height: 100vh;
     overflow-y: auto;
+    z-index: 5;
+  }
+
+  #headerImg {
+    position: relative;
+    z-index: 6;
+  }
+
+  #sidebar + .flex-shrink-0 {
+    margin-left: 280px;
   }
 }
