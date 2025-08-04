@@ -318,12 +318,14 @@ article .taped-image {
 
 .bookmark-menu {
   position: absolute;
-  top: 2.2rem; /* escondidas atrás da folha */
+  top: 2.2rem; /* no topo da folha */
+
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 0.5rem;
-  z-index: 0; /* atrás do conteúdo */
+  z-index: 2; /* acima do conteúdo para manter acessível */
+
 }
 
 .bookmark {
@@ -338,12 +340,13 @@ article .taped-image {
   position: relative;
   top: 0; /* parte escondida atrás da folha */
   transition: top 0.1s ease;
-  z-index: 0;
+  z-index: 1;
 }
 
 .bookmark:hover,
 .bookmark.active {
   top: -0.5rem; /* aparece um pouco mais */
+  z-index: 2;
 }
 
 .bookmark.entrada {
