@@ -318,12 +318,12 @@ article .taped-image {
 
 .bookmark-menu {
   position: absolute;
-  top: -1.2rem; /* colado ao topo da folha */
+  top: 2.2rem; /* no topo da folha */
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 0.5rem;
-  z-index: 3;
+  z-index: 2; /* acima do conteúdo para manter acessível */
 }
 
 .bookmark {
@@ -336,13 +336,15 @@ article .taped-image {
   color: black;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: relative;
-  top: 0;
+  top: 0; /* parte escondida atrás da folha */
   transition: top 0.1s ease;
-  z-index: 3;
+  z-index: 1;
 }
 
-.bookmark:hover {
-  top: 10px;
+.bookmark:hover,
+.bookmark.active {
+  top: -0.5rem; /* aparece um pouco mais */
+  z-index: 2;
 }
 
 .bookmark.entrada {
@@ -355,7 +357,3 @@ article .taped-image {
   color: white;
 }
 
-.bookmark.active {
-  top: -0.3rem; /* levanta o separador ativo */
-  z-index: 3;
-}
