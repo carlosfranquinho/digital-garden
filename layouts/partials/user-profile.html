@@ -1,22 +1,8 @@
 {{ partial "menus.html" . }}
 <div class="container-xl px-3 px-md-4 px-lg-5">
   <div class="gutter-condensed gutter-lg flex-column flex-md-row d-flex">
-    <div class="flex-shrink-0 col-12 col-md-3 mb-4 mb-md-0">
+    <div class="flex-shrink-0 col-12 col-md-3 mb-4 mb-md-0" id="sidebar">
       <div class="h-card mt-md-n5" style="margin-top:24px">
-        <div class="user-profile-sticky-bar js-user-profile-sticky-bar d-none d-md-block" id="headerStuck">
-          <div class="user-profile-mini-vcard d-table">
-            <span class="user-profile-mini-avatar d-table-cell v-align-middle lh-condensed-ultra pr-2">
-              {{ with $.Site.Params.avatar }}
-              <img class="rounded-1 avatar-user" height="32" width="32" src="{{ $.Site.Params.avatar }}">
-              {{ else }}
-              <img class="rounded-1 avatar-user" height="32" width="32" src="{{ "images/avatar.png" | absURL }}">
-              {{ end }}
-            </span>
-            <span class="d-table-cell v-align-middle lh-condensed">
-              <strong>{{ .Site.Params.author }}</strong>
-            </span>
-          </div>
-        </div>
         <div class="clearfix d-flex d-md-block flex-items-center mb-4 mb-md-0">
           <div class="position-relative d-inline-block col-2 col-md-12 mr-3 mr-md-0 flex-shrink-0" style="z-index:4;">
             {{ with $.Site.Params.avatar }}
@@ -184,20 +170,3 @@
     </div>
   </div>
 </div>
-<script>
-window.onscroll = function (e) {
-  const headerImg = document.querySelector('#headerImg');
-  const headerStuck = document.querySelector('#headerStuck');
-  if (headerImg.getBoundingClientRect().bottom <= 0) {
-    headerStuck.classList.add('is-stuck');
-    if (window.innerWidth >= 1280) {
-      headerStuck.setAttribute('style', 'top: 12px;')
-    } else {
-      headerStuck.setAttribute('style', 'top: 0;')
-    }
-  } else {
-    headerStuck.classList.remove('is-stuck');
-  }
-};
-
-</script>
