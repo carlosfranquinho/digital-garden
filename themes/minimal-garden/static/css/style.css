@@ -180,18 +180,10 @@ main h3 {
 }
 
 .post-list li {
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background-color: #f9f9f9;
+  margin-bottom: 4rem;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
   transition: box-shadow 0.2s ease-in-out;
 }
-
-.post-list li:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
-}
-
 
 .post-title {
   font-family: 'DM Serif Display', serif;
@@ -300,13 +292,13 @@ article .taped-image {
 }
 
 .taped-image::before {
-  top: -14px;
+  top: -2px;
   left: var(--pos-topo, 12%);
   transform: rotate(var(--rotacao-topo, -5deg));
 }
 
 .taped-image::after {
-  bottom: -14px;
+  bottom: 4px;
   right: var(--pos-fundo, 14%);
   transform: rotate(var(--rotacao-fundo, 5deg));
 }
