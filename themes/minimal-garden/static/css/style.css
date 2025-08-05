@@ -311,6 +311,65 @@ article .taped-image {
   transform: rotate(var(--rotacao-fundo, 5deg));
 }
 
+.taped-note {
+  position: relative;
+  display: block;
+  margin: 2em 0;
+  width: 100%;
+  box-sizing: border-box;
+  transform: rotate(var(--rotacao-img, -0.4deg));
+}
+
+.taped-note .taped-shadow {
+  display: block;
+  filter: drop-shadow(3px 4px 8px rgba(0, 0, 0, 0.12));
+}
+
+.taped-note-content {
+  background: url("/images/papel-envelhecido-textura.png") repeat;
+  background-position: center top;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 1.5rem;
+  clip-path: polygon(var(--p1x, 3%) var(--p1y, 0%),
+      var(--p2x, 97%) var(--p2y, 1%),
+      var(--p3x, 100%) var(--p3y, 5%),
+      var(--p4x, 99%) var(--p4y, 95%),
+      var(--p5x, 96%) var(--p5y, 100%),
+      var(--p6x, 4%) var(--p6y, 99%),
+      var(--p7x, 0%) var(--p7y, 95%),
+      var(--p8x, 1%) var(--p8y, 5%));
+}
+
+.taped-note::before,
+.taped-note::after {
+  content: '';
+  position: absolute;
+  width: 90px;
+  height: 28px;
+  background: repeating-linear-gradient(45deg,
+      rgba(240, 220, 150, 0.85),
+      rgba(240, 220, 150, 0.85) 10px,
+      rgba(235, 210, 140, 0.8) 10px,
+      rgba(235, 210, 140, 0.8) 20px);
+  opacity: 0.9;
+  z-index: 2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.taped-note::before {
+  top: -14px;
+  left: var(--pos-topo, 12%);
+  transform: rotate(var(--rotacao-topo, -5deg));
+}
+
+.taped-note::after {
+  bottom: -14px;
+  right: var(--pos-fundo, 14%);
+  transform: rotate(var(--rotacao-fundo, 5deg));
+}
+
 .bookmark-menu {
   position: absolute;
   top:-15px;

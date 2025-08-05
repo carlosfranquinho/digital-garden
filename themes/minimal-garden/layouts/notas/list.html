@@ -1,0 +1,30 @@
+{{ define "main" }}
+  <h1>{{ .Title }}</h1>
+
+  <ul class="post-list">
+    {{ range $i, $p := .Pages.ByDate.Reverse }}
+      {{ $seed := add now.UnixNano $i }}
+      {{ $rot := mod $seed 7 | sub 3 | float }}
+      {{ $top := mod (add $seed 11) 40 | add 10 }}
+      {{ $bottom := mod (add $seed 23) 40 | add 10 }}
+      {{ $rotTop := mod (add $seed 37) 10 | sub 5 | float }}
+      {{ $rotBottom := mod (add $seed 51) 10 | sub 5 | float }}
+      <li class="taped-note" style="--rotacao-img: {{ $rot }}deg; --pos-topo: {{ $top }}%; --pos-fundo: {{ $bottom }}%; --rotacao-topo: {{ $rotTop }}deg; --rotacao-fundo: {{ $rotBottom }}deg;">
+        <div class="taped-shadow">
+          <div class="taped-note-content">
+            <a class="post-title" href="{{ $p.RelPermalink }}">{{ $p.Title }}</a>
+            {{ with $p.Date }}
+              <time datetime="{{ . }}">{{ .Format "02/01/2006" }}</time>
+            {{ end }}
+            {{ with $p.Summary }}
+              <p>{{ . }}</p>
+            {{ else }}
+              {{ $summary := $p.Plain | truncate 160 }}
+              <p>{{ $summary }}</p>
+            {{ end }}
+          </div>
+        </div>
+      </li>
+    {{ end }}
+  </ul>
+{{ end }}
