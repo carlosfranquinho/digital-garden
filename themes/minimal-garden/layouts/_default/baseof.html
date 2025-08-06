@@ -14,12 +14,12 @@
   </head>
   <body>
     <div class="main-block">
-<div class="bookmark-menu">
+    <div class="container">
+        <div class="bookmark-menu">
   <a href="{{ "/" | relURL }}" class="bookmark entrada {{ if .IsHome }}active{{ end }}">Entrada</a>
 <a href="{{ "/notas/" | relURL }}" class="bookmark notas {{ if in .Permalink "/notas/" }}active{{ end }}">Notas</a>
 </div>
 
-      <div class="container">
         <div class="layout">
           <aside class="sidebar">
             <img src="{{ .Site.Params.avatar }}" alt="Avatar" class="avatar" />
