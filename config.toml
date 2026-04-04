@@ -43,6 +43,8 @@ pygmentsUseClasses = true
   name = "Grupo icarus"
   url = "https://icarus.borboletas.net"
   image = "/images/projects/icarus.webp"
+  img_width = 220
+  img_height = 97
   description = "Dedicado ao estudo e divulgação das borboletas da Marinha Grande, Leiria, Batalha e Porto de Mós."
   external = true
 
@@ -50,6 +52,8 @@ pygmentsUseClasses = true
   name = "Tempo e Lugar"
   url = "https://tempoelugar.franquinho.info"
   image = "/images/projects/tempo-e-lugar.webp"
+  img_width = 350
+  img_height = 105
   description = "Jorge Corvina ao seu dispor! Destinos através das eras."
   external = true
 

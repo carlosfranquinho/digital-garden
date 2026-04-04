@@ -379,7 +379,7 @@
     <a class="glass-card project-card" href="{{ .url }}"{{ if .external }} target="_blank" rel="noopener noreferrer"{{ end }}>
       <div class="project-card-icon">
         {{ if .image }}
-        <img class="project-card-logo" src="{{ .image }}" alt="{{ .name }}" />
+        <img class="project-card-logo" src="{{ .image }}" alt="{{ .name }}"{{ with .img_width }} width="{{ . }}"{{ end }}{{ with .img_height }} height="{{ . }}"{{ end }} />
         {{ else }}
         {{ .icon }}
         {{ end }}
