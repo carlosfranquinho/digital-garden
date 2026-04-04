@@ -1,0 +1,182 @@
+{{ define "main" }}
+<style>
+.single-article {
+  animation: slideUp 0.8s ease-out;
+  padding: 4rem 5rem;
+  margin: 0 auto 4rem;
+  max-width: 900px;
+}
+
+@media (max-width: 768px) {
+  .single-article { padding: 2.5rem 1.5rem; }
+}
+
+.single-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.single-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  line-height: 1.15;
+  color: var(--text-main);
+  margin-bottom: 1.5rem;
+}
+
+.single-meta {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--primary-color);
+  padding: 0.5rem 1.2rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.post-content {
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: #334155;
+}
+
+.post-content h1, .post-content h2, .post-content h3 {
+  font-family: 'DM Serif Display', serif;
+  color: var(--text-main);
+  margin-top: 3rem;
+  margin-bottom: 1.2rem;
+}
+
+.post-content h2 { font-size: 2.2rem; }
+.post-content h3 { font-size: 1.6rem; }
+
+.post-content p { margin-bottom: 1.6rem; }
+
+.post-content a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+  box-shadow: inset 0 -2px 0 rgba(59, 130, 246, 0.3);
+}
+
+.post-content a:hover {
+  color: var(--primary-hover);
+  box-shadow: inset 0 -10px 0 rgba(59, 130, 246, 0.2);
+}
+
+.post-content blockquote {
+  border-left: 4px solid var(--primary-color);
+  background: rgba(59, 130, 246, 0.05);
+  padding: 1.5rem 2rem;
+  margin: 2.5rem 0;
+  border-radius: 0 16px 16px 0;
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 1.2rem;
+}
+
+.post-content img {
+  border-radius: 16px;
+  box-shadow: 0 15px 25px -5px rgba(0,0,0,0.1);
+  margin: 3rem auto;
+  display: block;
+  max-width: 100%;
+}
+
+.post-content code {
+  background: rgba(0,0,0,0.06);
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  font-size: 0.9em;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.post-content pre {
+  background: #1e293b;
+  color: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 16px;
+  overflow-x: auto;
+  margin: 2.5rem 0;
+  box-shadow: 0 15px 25px -5px rgba(0,0,0,0.2);
+}
+
+.post-content pre code {
+  background: transparent; padding: 0; font-size: 0.9rem;
+}
+
+.post-content ul, .post-content ol {
+  margin-bottom: 1.6rem;
+  padding-left: 1.5rem;
+}
+.post-content li { margin-bottom: 0.5rem; }
+
+.modern-figure-naturalist {
+  position: relative;
+  display: block;
+  margin: 4.5rem auto;
+  max-width: fit-content;
+  z-index: 10;
+  /* A sombra agora contorna os recortes da tesoura e do rasgão perfeitamente */
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,0.15));
+}
+
+.modern-figure-naturalist img {
+  border-radius: 1px;
+  display: block;
+  max-width: 100%;
+  margin: 0;
+  /* Cortes orgânicos de tesoura: usa variáveis injectadas pelo shortcode */
+  clip-path: polygon(
+    var(--p1x, 2%) var(--p1y, 1%), 
+    var(--p2x, 99%) var(--p2y, 2%), 
+    var(--p3x, 98%) var(--p3y, 98%), 
+    var(--p4x, 1%) var(--p4y, 99%)
+  );
+  filter: contrast(1.02);
+}
+
+.modern-figure-naturalist::before,
+.modern-figure-naturalist::after {
+  content: '';
+  position: absolute;
+  width: 120px;
+  height: 34px;
+  background-color: rgba(244, 241, 234, 0.85);
+  background-image: repeating-linear-gradient(110deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  z-index: 15;
+  clip-path: polygon(0 0, 100% 0, 98% 10%, 100% 20%, 97% 30%, 100% 40%, 99% 50%, 100% 60%, 98% 70%, 100% 80%, 98% 90%, 100% 100%, 0 100%, 2% 90%, 0 80%, 3% 70%, 0 60%, 1% 50%, 0 40%, 2% 30%, 0 20%, 2% 10%);
+}
+
+.modern-figure-naturalist::before {
+  top: -12px; left: var(--tape-left, 50%); transform: translateX(-50%) rotate(var(--tape-rot, -2deg));
+}
+
+.modern-figure-naturalist::after {
+  bottom: -12px; left: var(--tape2-left, 50%); transform: translateX(-50%) rotate(var(--tape2-rot, 2deg));
+}
+
+/* @keyframes slideUp e fadeInDown definidos em baseof.html */
+</style>
+
+<article class="glass-card single-article">
+  <header class="single-header">
+    <h1 class="single-title">{{ .Title }}</h1>
+    {{ with .Date }}
+      <div class="single-meta">
+        {{ $meses := slice "janeiro" "fevereiro" "março" "abril" "maio" "junho" "julho" "agosto" "setembro" "outubro" "novembro" "dezembro" }}
+        {{ $mesIndex := sub .Month 1 }}
+        Publicado a {{ .Day }} de {{ index $meses $mesIndex }} de {{ .Year }}
+      </div>
+    {{ end }}
+  </header>
+
+  <div class="post-content">
+    {{ .Content }}
+  </div>
+</article>
+
+{{ end }}

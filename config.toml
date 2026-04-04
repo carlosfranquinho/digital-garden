@@ -1,26 +1,71 @@
-baseURL = "https://carlos.franquinho.info/"  # Altera para o teu domínio real
+baseURL = "https://carlos.franquinho.info/"
 languageCode = "pt-pt"
-title = "Digital Garden do Carlos"
-theme = "minimal-garden"
+title = "Carlos Franquinho"
+enableRobotsTXT = true
 pygmentsCodeFences = true
 pygmentsUseClasses = true
 
 [params]
-author = "Carlos Franquinho"
-description = "Algumas notas em modo digital garden"
-github = "carlosfranquinho"
-facebook = "franquinho"
-instagram = "franqui"
-email = "carlosfranquinho@gmail.com"
-url = "https://carlos.franquinho.info"
-keywords = ["digital garden", "obsidian", "hugo", "conhecimento"]
-favicon = "images/favicon.ico"
-avatar = "/images/avatar.png"
-location = "Marinha Grande, Portugal"
-enableGitalk = false
-enableRSS = true
-enableGoogleAnalytics = false
-custom_css = ["css/custom.css"]
+  author = "Carlos Franquinho"
+  description = "Curiosidades, notas e projetos de Carlos Franquinho"
+  location = "Marinha Grande, Portugal"
+  email = "carlosfranquinho@gmail.com"
+  url = "https://carlos.franquinho.info"
+  github = "carlosfranquinho"
+  facebook = "franquinho"
+  instagram = "franqui"
+  keywords = ["digital garden", "notas", "programação", "genealogia", "borboletas"]
+  favicon = "images/favicon.ico"
+  avatar = "/images/avatar.png"
+  enableRSS = true
+  enableGoogleAnalytics = false
+  enableGitalk = false
+
+# Projetos mostrados na homepage.
+# Cada projeto pode ter um emoji (icon) ou uma imagem (image = "/images/projects/ficheiro.png").
+# Se tiver image, o emoji é ignorado.
+[[params.projects]]
+  name = "Notas"
+  url = "/notas/"
+  icon = "🌱"
+  description = "Pensamentos e ideias em crescimento."
+  external = false
+
+[[params.projects]]
+  name = "Franquinho"
+  url = "https://www.franquinho.info"
+  icon = "🌳"
+  # image = "/images/projects/franquinho.png"
+  description = "Arquivo genealógico da família Franquinho."
+  external = true
+
+[[params.projects]]
+  name = "Grupo icarus"
+  url = "https://icarus.borboletas.net"
+  image = "/images/projects/icarus.webp"
+  description = "Dedicado ao estudo e divulgação das borboletas da Marinha Grande, Leiria, Batalha e Porto de Mós."
+  external = true
+
+[[params.projects]]
+  name = "Tempo e Lugar"
+  url = "https://tempoelugar.franquinho.info"
+  image = "/images/projects/tempo-e-lugar.webp"
+  description = "Jorge Corvina ao seu dispor! Destinos através das eras."
+  external = true
+
+[[params.projects]]
+  name = "Brisas do Pinhal"
+  icon = "🌬️"
+  description = "Os ventos, as chuvas e as temperaturas cá da terra."
+  paused = true
+
+[[params.projects]]
+  name = "Pinhal do Rei"
+  url = "https://pinhaldorei.net"
+  icon = "🌲"
+  # image = "/images/projects/pinhal.png"
+  description = "Catedral verde e sussurrante, aonde a luz se ameiga e se esconde e aonde, ecoando a cantar, se alonga e se prolonga a longa voz do mar."
+  external = true
 
 [menu]
   [[menu.main]]
@@ -29,13 +74,12 @@ custom_css = ["css/custom.css"]
     weight = 3
 
 [permalinks]
-notas = "/notas/:slug/"
-
+  notas = "/notas/:slug/"
 
 [markup]
   [markup.highlight]
     noClasses = false
-    
+
   [markup.goldmark]
     [markup.goldmark.renderer]
       unsafe = true

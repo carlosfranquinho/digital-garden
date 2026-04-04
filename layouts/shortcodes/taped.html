@@ -1,0 +1,26 @@
+{{/* layouts/shortcodes/taped.html - Naturalist Notebook Dynamic Override */}}
+{{ $seed := now.UnixNano }}
+{{ $imgRot := mod $seed 4 | sub 2 | float }}
+{{ $tapeRot := mod (add $seed 17) 10 | sub 5 | float }}
+{{ $tapeLeft := mod (add $seed 31) 60 | add 20 | float }}
+{{ $tape2Rot := mod (add $seed 43) 10 | sub 5 | float }}
+{{ $tape2Left := mod (add $seed 59) 60 | add 20 | float }}
+
+{{/* Corte à tesoura orgânico: Cada canto varia independentemente de 0% a 4% */}}
+{{ $p1x := mod (add $seed 11) 5 | float }} {{ $p1y := mod (add $seed 13) 5 | float }}
+{{ $p2x := sub 100 (mod (add $seed 23) 5) | float }} {{ $p2y := mod (add $seed 29) 5 | float }}
+{{ $p3x := sub 100 (mod (add $seed 37) 5) | float }} {{ $p3y := sub 100 (mod (add $seed 41) 5) | float }}
+{{ $p4x := mod (add $seed 47) 5 | float }} {{ $p4y := sub 100 (mod (add $seed 53) 5) | float }}
+
+<figure class="modern-figure-naturalist" style="
+  --tilt: {{ $imgRot }}deg; 
+  --tape-rot: {{ $tapeRot }}deg; --tape-left: {{ $tapeLeft }}%; 
+  --tape2-rot: {{ $tape2Rot }}deg; --tape2-left: {{ $tape2Left }}%; 
+  --p1x: {{ $p1x }}%; --p1y: {{ $p1y }}%;
+  --p2x: {{ $p2x }}%; --p2y: {{ $p2y }}%;
+  --p3x: {{ $p3x }}%; --p3y: {{ $p3y }}%;
+  --p4x: {{ $p4x }}%; --p4y: {{ $p4y }}%;
+  transform: rotate(var(--tilt));
+">
+  <img src="{{ .Get "src" }}" alt="{{ .Get "alt" | default (.Get "src" | path.Base) }}" loading="lazy">
+</figure>

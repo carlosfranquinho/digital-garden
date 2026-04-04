@@ -1,0 +1,76 @@
+{{ define "main" }}
+<style>
+.list-header {
+  text-align: center;
+  margin-bottom: 4rem;
+  margin-top: 1rem;
+  animation: fadeInDown 0.8s ease-out;
+}
+
+.list-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: var(--text-main);
+  margin-bottom: 1rem;
+  font-weight: normal;
+}
+
+.list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  animation: slideUp 1s ease-out 0.2s both;
+}
+
+.list-card {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 2.5rem;
+  text-decoration: none;
+  color: inherit;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.list-card:hover {
+  transform: translateY(-6px);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.list-card-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  font-weight: normal;
+  color: var(--text-main);
+  margin: 0 0 0.6rem 0;
+  transition: color 0.2s;
+}
+
+.list-card:hover .list-card-title { color: var(--primary-color); }
+
+.list-card-meta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* @keyframes definidos em baseof.html */
+</style>
+
+<div class="list-header">
+  <h1 class="list-title">{{ .Title }}</h1>
+</div>
+
+{{ if .Pages }}
+<div class="list-grid">
+  {{ range .Pages.ByDate.Reverse }}
+  <a href="{{ .RelPermalink }}" class="glass-card list-card">
+    <h2 class="list-card-title">{{ .Title }}</h2>
+    {{ with .Date }}
+    <time datetime="{{ .Format "2006-01-02" }}" class="list-card-meta">{{ .Format "02/01/2006" }}</time>
+    {{ end }}
+  </a>
+  {{ end }}
+</div>
+{{ end }}
+{{ end }}

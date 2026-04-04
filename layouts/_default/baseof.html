@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.LanguageCode }}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ if .Title }}{{ .Title }} | {{ end }}{{ .Site.Title }}</title>
+
+    <!-- SEO -->
+    <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+    {{ with .Site.Params.keywords }}
+    <meta name="keywords" content="{{ delimit . ", " }}">
+    {{ end }}
+    <link rel="canonical" href="{{ .Permalink }}">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="{{ if .Title }}{{ .Title }}{{ else }}{{ .Site.Title }}{{ end }}">
+    <meta property="og:description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+    <meta property="og:url" content="{{ .Permalink }}">
+    <meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+    <meta property="og:image" content="{{ .Site.Params.avatar | absURL }}">
+    <meta property="og:locale" content="pt_PT">
+    <meta property="og:site_name" content="{{ .Site.Title }}">
+
+    <!-- RSS -->
+    {{ if .Site.Params.enableRSS }}
+    <link rel="alternate" type="application/rss+xml" title="{{ .Site.Title }}" href="{{ "/index.xml" | absURL }}">
+    {{ end }}
+
+    <!-- Favicon -->
+    <link rel="icon" href="{{ .Site.Params.favicon | relURL }}">
+
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <style>
+      /* Reset */
+      *, *::before, *::after { box-sizing: border-box; }
+      img { max-width: 100%; height: auto; display: block; }
+      a { color: inherit; }
+
+      :root {
+        --primary-color: #3b82f6;
+        --primary-hover: #2563eb;
+        --bg-gradient-start: #f8fafc;
+        --bg-gradient-end: #e2e8f0;
+        --text-main: #0f172a;
+        --text-muted: #475569;
+        --card-bg: rgba(255, 255, 255, 0.7);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      body {
+        margin: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+        min-height: 100vh;
+        color: var(--text-main);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      /* Focus global — navegação por teclado */
+      a:focus-visible,
+      button:focus-visible {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 3px;
+        border-radius: 4px;
+      }
+
+      .modern-navbar {
+        width: 100%;
+        max-width: 900px;
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        animation: fadeInDown 0.8s ease-out;
+      }
+
+      .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        text-decoration: none;
+        color: var(--text-main);
+        font-family: 'DM Serif Display', serif;
+        font-size: 1.3rem;
+      }
+
+      .nav-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .nav-link {
+        text-decoration: none;
+        color: var(--text-muted);
+        font-weight: 600;
+        padding: 0.5rem 1.2rem;
+        border-radius: 999px;
+        transition: var(--transition);
+        font-size: 0.95rem;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        background: rgba(255, 255, 255, 0.8);
+        color: var(--primary-color);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .page-content-wrapper {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        padding: 0 1.5rem 4rem;
+      }
+
+      .page-inner {
+        width: 100%;
+        max-width: 900px;
+      }
+
+      .glass-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 24px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+      }
+
+      /* Keyframes — usados em múltiplas páginas */
+      @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes slideUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+        50%       { opacity: 0.4; transform: translate(-50%, -50%) scale(1.1); }
+      }
+
+      @keyframes morph {
+        0%   { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+        25%  { border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%; }
+        50%  { border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%; }
+        75%  { border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%; }
+        100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+      }
+
+      .site-footer {
+        width: 100%;
+        text-align: center;
+        padding: 2rem 1.5rem;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        opacity: 0.6;
+      }
+
+      .site-footer p {
+        margin: 0;
+      }
+
+      /* Respeitar preferência por menos movimento */
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+
+    {{ if not .IsHome }}
+    <nav class="modern-navbar">
+      <a href="{{ "/" | relURL }}" class="nav-logo" aria-label="Ir para a página inicial">
+        <img src="{{ .Site.Params.avatar }}" alt="{{ .Site.Params.author }}" class="nav-avatar" />
+        {{ .Site.Title }}
+      </a>
+      <div class="nav-links">
+        <a href="{{ "/" | relURL }}" class="nav-link">Início</a>
+        <a href="{{ "/notas/" | relURL }}" class="nav-link {{ if in .Permalink "/notas/" }}active{{ end }}">Notas</a>
+      </div>
+    </nav>
+    {{ end }}
+
+    <div class="page-content-wrapper">
+      <div class="page-inner">
+        {{ block "main" . }}{{ end }}
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <p>&copy; {{ now.Year }} {{ .Site.Params.author }}</p>
+    </footer>
+
+  </body>
+</html>
