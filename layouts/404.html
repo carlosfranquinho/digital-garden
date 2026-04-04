@@ -1,0 +1,99 @@
+{{ define "main" }}
+<style>
+.error-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 60vh;
+  padding: 4rem 2rem;
+  margin: 4rem auto;
+  max-width: 800px;
+  animation: slideUp 0.8s ease-out;
+}
+
+.error-avatar-wrapper {
+  position: relative;
+  width: clamp(160px, 25vw, 220px);
+  height: clamp(160px, 25vw, 220px);
+  flex-shrink: 0;
+  margin-bottom: 1.5rem;
+}
+
+.error-avatar-backdrop {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 105%; height: 105%; border-radius: 50%;
+  background: linear-gradient(135deg, #ef4444, #f59e0b, #eab308);
+  opacity: 0.25; filter: blur(25px); animation: pulse404 6s infinite;
+}
+
+.error-avatar {
+  position: relative; width: 100%; height: 100%; object-fit: cover;
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 6px solid #fff;
+  transition: all 0.3s; animation: morph404 8s ease-in-out infinite; z-index: 10;
+}
+
+.error-avatar:hover { transform: scale(1.03); border-color: #f8fafc; }
+
+@keyframes pulse404 { 0%, 100% { opacity: 0.25; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 0.35; transform: translate(-50%, -50%) scale(1.1); } }
+@keyframes morph404 {
+  0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+  25% { border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%; }
+  50% { border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%; }
+  75% { border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%; }
+  100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+}
+
+.error-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.error-desc {
+  font-size: 1.15rem;
+  color: #475569;
+  max-width: 500px;
+  margin-bottom: 3.5rem;
+  line-height: 1.6;
+}
+
+.btn-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem 2rem;
+  background: var(--primary-color);
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+}
+
+.btn-home:hover {
+  background: var(--primary-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+</style>
+
+<div class="glass-card error-page">
+  <div class="error-avatar-wrapper">
+    <div class="error-avatar-backdrop"></div>
+    <img class="error-avatar" src="/images/404.png" alt="Erro 404" />
+  </div>
+  <h1 class="error-title">Página não encontrada</h1>
+  <p class="error-desc">
+    Parece que se perdeu a explorar o jardim digital.<br> A página que procura foi movida, eliminada, ou nunca chegou a ser plantada.
+  </p>
+  <a href="{{ .Site.BaseURL }}" class="btn-home">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Voltar ao início
+  </a>
+</div>
+{{ end }}
