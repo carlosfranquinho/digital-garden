@@ -59,9 +59,12 @@ pygmentsUseClasses = true
 
 [[params.projects]]
   name = "Brisas do Pinhal"
-  icon = "🌬️"
+  url = "https://brisas.pinhaldorei.net"
+  image = "/images/projects/brisas-logo.svg"
+  img_width = 82
+  img_height = 82
   description = "Os ventos, as chuvas e as temperaturas cá da terra."
-  paused = true
+  external = true
 
 [[params.projects]]
   name = "Pinhal do Rei"
