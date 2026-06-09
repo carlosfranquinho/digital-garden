@@ -1,3 +1,30 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>#Notas-Ligadas on Carlos Franquinho</title><link>https://carlos.franquinho.info/tags/%23notas-ligadas/</link><description>Recent content in #Notas-Ligadas on Carlos Franquinho</description><generator>Hugo</generator><language>pt-pt</language><lastBuildDate>Sun, 13 Apr 2025 00:09:19 +0000</lastBuildDate><atom:link href="https://carlos.franquinho.info/tags/%23notas-ligadas/index.xml" rel="self" type="application/rss+xml"/><item><title>Digital Garden</title><link>https://carlos.franquinho.info/notas/digital-garden/</link><pubDate>Sun, 13 Apr 2025 00:09:19 +0000</pubDate><guid>https://carlos.franquinho.info/notas/digital-garden/</guid><description>&lt;h1 id="o-que-é-um-digital-garden">O que é um digital garden?&lt;/h1>
-&lt;p>Um &lt;strong>digital garden&lt;/strong> é uma forma de organizar e partilhar conhecimento pessoal na internet, de forma &lt;strong>não linear&lt;/strong> e &lt;strong>evolutiva&lt;/strong>. Ao contrário de um blog tradicional (que segue um estrutura cronológica rígida), um digital garden é mais próximo de um jardim de ideias: vai crescendo, sendo remendado, reestruturado e melhorado ao longo do tempo.&lt;br>
-É um espaço onde o autor cultiva notas, pensamentos, aprendizagens, reflexões ou recursos - muitas vezes com ligações internas entre os temas (está tudo ligado!).&lt;/p></description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>#Notas-Ligadas on Carlos Franquinho</title><link>https://carlos.franquinho.info/tags/%23notas-ligadas/</link><description>Recent content in #Notas-Ligadas on Carlos Franquinho</description><generator>Hugo</generator><language>pt-pt</language><lastBuildDate>Sun, 13 Apr 2025 00:09:19 +0000</lastBuildDate><atom:link href="https://carlos.franquinho.info/tags/%23notas-ligadas/index.xml" rel="self" type="application/rss+xml"/><item><title>Digital Garden</title><link>https://carlos.franquinho.info/notas/digital-garden/</link><pubDate>Sun, 13 Apr 2025 00:09:19 +0000</pubDate><guid>https://carlos.franquinho.info/notas/digital-garden/</guid><description>&lt;p>Um blog tem posts. Um digital garden tem notas. Parece uma distinção trivial, mas muda tudo na forma como se escreve.&lt;/p>
+
+
+
+
+
+
+
+
+
+ 
+ 
+ 
+ 
+
+&lt;figure class="modern-figure-naturalist" style="
+ --tilt: 2deg; 
+ --tape-rot: -2deg; --tape-left: 71%; 
+ --tape2-rot: 2deg; --tape2-left: 39%; 
+ --p1x: 1%; --p1y: 3%;
+ --p2x: 97%; --p2y: 4%;
+ --p3x: 98%; --p3y: 99%;
+ --p4x: 2%; --p4y: 97%;
+ transform: rotate(var(--tilt));
+">
+ &lt;img src="digital-garden-1.webp" alt="digital-garden" loading="lazy">
+&lt;/figure>
+
+&lt;h2 id="o-que-é-um-digital-garden">O que é um digital garden?&lt;/h2>
+&lt;p>É um espaço pessoal na internet para organizar conhecimento de forma não linear - mais próximo de um caderno de apontamentos público do que de um jornal. Não há uma ordem cronológica obrigatória. As notas crescem, são revistas, ligadas umas às outras, abandonadas a meio e retomadas meses depois. O estado &amp;ldquo;inacabado&amp;rdquo; não é um problema a resolver - é o formato.&lt;/p></description></item></channel></rss>

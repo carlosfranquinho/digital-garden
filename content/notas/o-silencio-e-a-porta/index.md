@@ -6,7 +6,6 @@ tags:
   - astronomia
   - cosmologia
   - filosofia
-  - inteligência extraterrestre
   - simulação
   - consciência
 ---
@@ -16,7 +15,6 @@ Há mais estrelas no universo observável do que grãos de areia em todas as pra
 Olha para o céu numa noite limpa e conta as estrelas visíveis a olho nu, talvez três mil. Cada uma representa, grosso modo, centenas de milhões que não vês. E a Via Láctea é uma entre dois biliões de galáxias no universo observável.
 
 Com estes números, a questão não é se existe vida inteligente no universo. A questão é o silêncio.
-
 
 ## O paradoxo que não é um paradoxo
 
