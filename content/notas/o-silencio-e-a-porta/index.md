@@ -16,7 +16,7 @@ Há mais estrelas no universo observável do que grãos de areia em todas as pra
 Olha para o céu numa noite limpa e conta as estrelas visíveis a olho nu, talvez três mil. Cada uma representa, grosso modo, centenas de milhões que não vês. E a Via Láctea é uma entre dois biliões de galáxias no universo observável.
 
 Com estes números, a questão não é se existe vida inteligente no universo. A questão é o silêncio.
----
+
 
 ## O paradoxo que não é um paradoxo
 
@@ -111,6 +111,8 @@ A solução lógica seria deixar uma porta aberta. Não sair. Não esperar. Mas 
 É também o protocolo de primeiro contacto mais seguro que consigo imaginar. No universo físico o contacto implica vulnerabilidade existencial: uma nave no teu planeta é uma ameaça potencial independentemente das intenções, e a história terrestre de encontros entre civilizações assimétricas não é animadora. Num espaço virtual controlado pelo anfitrião isso desaparece. Podes receber o estranho, observá-lo, comunicar com ele, e fechar a porta se necessário.
 
 O silêncio do universo físico não seria então abandono. Seria um convite com condições: _encontra-nos quando chegares ao mesmo nível. Quando compreenderes que o físico é o berço, não o destino._ Um rito de passagem cósmico, em que a porta só se torna visível quando uma civilização desenvolveu a maturidade para a procurar no lugar certo.
+
+{{< taped src="o-silencio-e-a-porta-1.webp" alt="o-silencio-e-a-porta" >}}
 
 ---
 
