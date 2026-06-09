@@ -189,6 +189,17 @@
           animation-iteration-count: 1 !important;
           transition-duration: 0.01ms !important;
         }
+        /* Exceção: animações decorativas do avatar (sem movimento extenso) */
+        .avatar-backdrop,
+        .error-avatar-backdrop {
+          animation-duration: 6s !important;
+          animation-iteration-count: infinite !important;
+        }
+        .hero-avatar,
+        .error-avatar {
+          animation-duration: 8s !important;
+          animation-iteration-count: infinite !important;
+        }
       }
     </style>
   </head>
